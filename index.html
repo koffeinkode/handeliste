@@ -189,7 +189,8 @@
             transition: background 0.15s ease;
         }
 
-        .autocomplete-item:hover {
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
             background: var(--primary-light);
         }
 
@@ -1088,6 +1089,8 @@
         let learnedVariants = {};
         let lastAddedItemId = null;
         let lastAddedCategory = null;
+        let selectedAutocompleteIndex = -1;
+        let currentAutocompleteMatches = [];
 
         const FILLER_WORDS = [
             'kan', 'du', 'handle', 'kjøpe', 'hente', 'få', 'tak', 'i', 'trenger', 'må', 'ha',
@@ -1179,7 +1182,18 @@
             });
 
             searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                const autocomplete = document.getElementById('autocomplete');
+                const isAutocompleteVisible = autocomplete.style.display === 'block';
+
+                if (e.key === 'ArrowDown' && isAutocompleteVisible) {
+                    e.preventDefault();
+                    selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, currentAutocompleteMatches.length - 1);
+                    updateAutocompleteSelection();
+                } else if (e.key === 'ArrowUp' && isAutocompleteVisible) {
+                    e.preventDefault();
+                    selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+                    updateAutocompleteSelection();
+                } else if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     const text = e.target.value.trim();
 
@@ -1187,12 +1201,16 @@
                         return;
                     }
 
-                    if (text) {
+                    if (isAutocompleteVisible && selectedAutocompleteIndex >= 0) {
+                        const selected = currentAutocompleteMatches[selectedAutocompleteIndex];
+                        selectAutocomplete(selected.item, selected.category);
+                    } else if (text) {
                         addItem(text);
                         e.target.value = '';
                         e.target.style.height = 'auto';
                         autocomplete.style.display = 'none';
                     }
+                    selectedAutocompleteIndex = -1;
                 }
             });
 
@@ -1319,20 +1337,34 @@
         function showAutocomplete(query) {
             const autocomplete = document.getElementById('autocomplete');
             const matches = findMatches(query);
+            currentAutocompleteMatches = matches.slice(0, 8);
+            selectedAutocompleteIndex = -1;
 
-            if (matches.length === 0) {
+            if (currentAutocompleteMatches.length === 0) {
                 autocomplete.style.display = 'none';
                 return;
             }
 
-            autocomplete.innerHTML = matches.slice(0, 8).map(match => `
-                <div class="autocomplete-item" onclick="selectAutocomplete('${match.item}', '${match.category}')">
+            autocomplete.innerHTML = currentAutocompleteMatches.map((match, index) => `
+                <div class="autocomplete-item" onclick="selectAutocomplete('${match.item}', '${match.category}')" data-index="${index}">
                     <span>${match.item}</span>
                     <span class="autocomplete-category">${match.category}</span>
                 </div>
             `).join('');
 
             autocomplete.style.display = 'block';
+        }
+
+        function updateAutocompleteSelection() {
+            const items = document.querySelectorAll('.autocomplete-item');
+            items.forEach((item, index) => {
+                if (index === selectedAutocompleteIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
         }
 
         function findMatches(query) {
@@ -1366,7 +1398,10 @@
         function selectAutocomplete(item, category) {
             addItemToList(item, category);
             document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').style.height = 'auto';
             document.getElementById('autocomplete').style.display = 'none';
+            selectedAutocompleteIndex = -1;
+            currentAutocompleteMatches = [];
         }
 
         function normalizeText(text) {
