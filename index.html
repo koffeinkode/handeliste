@@ -28,12 +28,7 @@
 
         body {
             font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
-            background:
-                radial-gradient(ellipse at 20% 30%, rgba(217, 119, 6, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(132, 204, 22, 0.10) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 90%, rgba(251, 191, 36, 0.08) 0%, transparent 60%),
-                linear-gradient(135deg, #fefcf5 0%, #f5f3e8 100%);
-            background-attachment: fixed;
+            background: #fafaf8;
             min-height: 100vh;
             padding: 20px;
             color: #1d1d1f;
@@ -93,10 +88,7 @@
             margin-bottom: 8px;
             font-weight: 700;
             letter-spacing: -1.5px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary);
         }
 
         .subtitle {
@@ -106,7 +98,7 @@
         }
 
         .adhd-explanation {
-            background: linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(132, 204, 22, 0.08));
+            background: rgba(217, 119, 6, 0.06);
             border: 1px solid rgba(217, 119, 6, 0.2);
             border-radius: 10px;
             padding: 16px 20px;
@@ -665,6 +657,10 @@
                 <p style="margin-top: 10px; font-size: 0.9em;">Lim inn en liste eller søk etter enkelvarer i feltet over</p>
             </div>
         </div>
+
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #86868b; font-size: 14px;">
+            Et lite prosjekt av Hallvar Bugge Johnsen - <a href="mailto:hei@hallvar.no" style="color: var(--primary); text-decoration: none;">hei@hallvar.no</a>
+        </footer>
     </div>
 
     <script>
@@ -686,7 +682,7 @@
                 alertSelectCategory: 'Vennligst velg kategori for alle ukjente varer!',
                 alertConfirmClear: 'Er du sikker på at du vil tømme hele listen?',
                 alertListEmpty: 'Listen er allerede tom!',
-                adhdExplanation: '<strong>En ADHD-vennlig handleliste</strong> - Lim inn en formatert handleliste/melding du har fått fra noen andre, og Handlelisten vil sortere ut varer basert på kategorier automatisk for enklere handleturer',
+                adhdExplanation: '<strong>En ADHD-vennlig handleliste</strong> - Lim inn en formatert handleliste/melding du har fått fra noen andre, og Handleliste vil sortere ut varer basert på kategorier automatisk for enklere handleturer',
                 categories: {
                     'Frukt & Grønt': '🥬 Frukt & Grønt',
                     'Kjøtt & Fisk': '🥩 Kjøtt & Fisk',
