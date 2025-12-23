@@ -354,6 +354,37 @@
             color: #1d1d1f;
         }
 
+        .item-note {
+            font-size: 13px;
+            color: #86868b;
+            font-style: italic;
+            margin-top: 3px;
+        }
+
+        .edit-note-btn {
+            background: transparent;
+            color: #86868b;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.15s ease;
+            min-width: auto;
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .edit-note-btn:hover {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--primary);
+            opacity: 1;
+        }
+
+        .edit-note-btn:active {
+            transform: scale(0.95);
+        }
+
         .delete-btn {
             background: transparent;
             color: #86868b;
@@ -700,6 +731,22 @@
             <div class="modal-buttons">
                 <button class="btn-primary" onclick="importList()">✅ Importer</button>
                 <button class="btn-secondary" onclick="closeImportModal()">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeNoteModal()">×</button>
+            <h2 class="modal-header" id="noteModalTitle">Rediger notat</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;" id="noteItemName"></label>
+                <input type="text" id="noteInput" placeholder="F.eks: 4 stk, 2 kg, økologisk..." style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 15px;">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="saveNote()">✅ Lagre</button>
+                <button class="btn-secondary" onclick="closeNoteModal()">Avbryt</button>
             </div>
         </div>
     </div>
@@ -1150,6 +1197,7 @@
         let lastAddedCategory = null;
         let selectedAutocompleteIndex = -1;
         let currentAutocompleteMatches = [];
+        let currentEditingItemId = null;
 
         const FILLER_WORDS = [
             'kan', 'du', 'handle', 'kjøpe', 'hente', 'få', 'tak', 'i', 'trenger', 'må', 'ha',
@@ -1576,7 +1624,8 @@
                     id: newItemId,
                     name: displayName,
                     category,
-                    checked: false
+                    checked: false,
+                    note: ''
                 });
 
                 // Set last added item for highlighting
@@ -1653,10 +1702,15 @@
 
                 const itemsHtml = items.map(item => {
                     const isHighlighted = item.id === lastAddedItemId;
+                    const noteHtml = item.note ? `<div class="item-note">${item.note}</div>` : '';
                     return `
                         <div class="item ${item.checked ? 'checked' : ''} ${isHighlighted ? 'highlight' : ''}" onclick="toggleItem(${item.id})">
                             <input type="checkbox" ${item.checked ? 'checked' : ''}>
-                            <span class="item-name">${item.name}</span>
+                            <div style="flex: 1;">
+                                <div class="item-name">${item.name}</div>
+                                ${noteHtml}
+                            </div>
+                            <button class="edit-note-btn" onclick="event.stopPropagation(); editNote(${item.id})" title="Rediger notat">✏️</button>
                             <button class="delete-btn" onclick="event.stopPropagation(); deleteItem(${item.id})">×</button>
                         </div>
                     `;
@@ -1832,6 +1886,38 @@
 
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
+        }
+
+        function editNote(id) {
+            const item = shoppingList.find(item => item.id === id);
+            if (!item) return;
+
+            currentEditingItemId = id;
+            document.getElementById('noteItemName').textContent = item.name;
+            document.getElementById('noteInput').value = item.note || '';
+            document.getElementById('noteModal').classList.add('active');
+
+            setTimeout(() => {
+                document.getElementById('noteInput').focus();
+            }, 100);
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            currentEditingItemId = null;
+        }
+
+        function saveNote() {
+            if (!currentEditingItemId) return;
+
+            const item = shoppingList.find(item => item.id === currentEditingItemId);
+            if (!item) return;
+
+            item.note = document.getElementById('noteInput').value.trim();
+
+            saveToStorage();
+            renderList();
+            closeNoteModal();
         }
 
         initializeApp();
