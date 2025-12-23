@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Handeliste 1.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
 
@@ -652,6 +653,8 @@
                 </div>
             </div>
             <div class="button-group" style="margin-top: 12px;">
+                <button class="btn-secondary" onclick="shareList()">📤 Del liste</button>
+                <button class="btn-secondary" onclick="showImportModal()">📥 Importer liste</button>
                 <button class="btn-secondary" onclick="clearList()">🗑️ Tøm liste</button>
             </div>
         </div>
@@ -669,6 +672,38 @@
         </footer>
     </div>
 
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeShareModal()">×</button>
+            <h2 class="modal-header" id="shareModalTitle">Del handleliste</h2>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div id="qrcode" style="display: inline-block; padding: 20px; background: white; border-radius: 8px;"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;" id="shareCodeLabel">Eller del denne koden:</label>
+                <input type="text" id="shareCode" readonly style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: monospace; font-size: 13px; background: rgba(0,0,0,0.02);">
+                <button class="btn-primary" onclick="copyShareCode()" style="margin-top: 10px; width: 100%;">📋 Kopier kode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeImportModal()">×</button>
+            <h2 class="modal-header" id="importModalTitle">Importer handleliste</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;" id="importCodeLabel">Lim inn kode:</label>
+                <input type="text" id="importCode" placeholder="Lim inn kode her..." style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: monospace; font-size: 13px;">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="importList()">✅ Importer</button>
+                <button class="btn-secondary" onclick="closeImportModal()">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentLanguage = localStorage.getItem('language') || 'no';
 
@@ -678,8 +713,20 @@
                 appSubtitle: 'Lim inn handleliste eller søk etter enkelvarer',
                 searchPlaceholder: 'Lim inn handleliste eller søk etter vare...',
                 clearListBtn: '🗑️ Tøm liste',
+                shareListBtn: '📤 Del liste',
+                importListBtn: '📥 Importer liste',
                 addAllBtn: '✅ Legg til alle',
                 cancelBtn: 'Avbryt',
+                shareModalTitle: 'Del handleliste',
+                shareCodeLabel: 'Eller del denne koden:',
+                copyCodeBtn: '📋 Kopier kode',
+                importModalTitle: 'Importer handleliste',
+                importCodeLabel: 'Lim inn kode:',
+                importCodePlaceholder: 'Lim inn kode her...',
+                importBtn: '✅ Importer',
+                codeCopied: 'Kode kopiert!',
+                importSuccess: 'Handleliste importert!',
+                importError: 'Ugyldig kode. Vennligst prøv igjen.',
                 recognizedItems: 'Gjenkjente varer',
                 unknownItems: 'Ukjente varer - velg kategori',
                 selectCategory: 'Velg kategori',
@@ -715,8 +762,20 @@
                 appSubtitle: 'Paste your list or search for items',
                 searchPlaceholder: 'Paste shopping list or search for items...',
                 clearListBtn: '🗑️ Clear list',
+                shareListBtn: '📤 Share list',
+                importListBtn: '📥 Import list',
                 addAllBtn: '✅ Add all',
                 cancelBtn: 'Cancel',
+                shareModalTitle: 'Share shopping list',
+                shareCodeLabel: 'Or share this code:',
+                copyCodeBtn: '📋 Copy code',
+                importModalTitle: 'Import shopping list',
+                importCodeLabel: 'Paste code:',
+                importCodePlaceholder: 'Paste code here...',
+                importBtn: '✅ Import',
+                codeCopied: 'Code copied!',
+                importSuccess: 'Shopping list imported!',
+                importError: 'Invalid code. Please try again.',
                 recognizedItems: 'Recognized items',
                 unknownItems: 'Unknown items - select category',
                 selectCategory: 'Select category',
@@ -1145,14 +1204,22 @@
             document.getElementById('searchInput').placeholder = t('searchPlaceholder');
             document.getElementById('adhd-text').innerHTML = t('adhdExplanation');
 
-            const clearBtn = document.querySelector('.button-group button');
-            if (clearBtn) clearBtn.textContent = t('clearListBtn');
+            const buttons = document.querySelectorAll('.button-group button');
+            if (buttons[0]) buttons[0].textContent = t('shareListBtn');
+            if (buttons[1]) buttons[1].textContent = t('importListBtn');
+            if (buttons[2]) buttons[2].textContent = t('clearListBtn');
 
             const addAllBtn = document.getElementById('addAllBtn');
             if (addAllBtn) addAllBtn.textContent = t('addAllBtn');
 
             const cancelBtn = document.getElementById('cancelBtn');
             if (cancelBtn) cancelBtn.textContent = t('cancelBtn');
+
+            document.getElementById('shareModalTitle').textContent = t('shareModalTitle');
+            document.getElementById('shareCodeLabel').textContent = t('shareCodeLabel');
+            document.getElementById('importModalTitle').textContent = t('importModalTitle');
+            document.getElementById('importCodeLabel').textContent = t('importCodeLabel');
+            document.getElementById('importCode').placeholder = t('importCodePlaceholder');
         }
 
         function setupSearchListeners() {
@@ -1659,7 +1726,116 @@
             if (savedVariants) learnedVariants = JSON.parse(savedVariants);
         }
 
+        function shareList() {
+            if (shoppingList.length === 0) {
+                alert(t('alertListEmpty'));
+                return;
+            }
+
+            const listData = {
+                items: shoppingList,
+                customItems: customItems,
+                learnedVariants: learnedVariants
+            };
+
+            const jsonString = JSON.stringify(listData);
+            const encoded = btoa(encodeURIComponent(jsonString));
+
+            document.getElementById('shareCode').value = encoded;
+
+            const qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = '';
+            new QRCode(qrcodeDiv, {
+                text: window.location.origin + window.location.pathname + '?import=' + encoded,
+                width: 200,
+                height: 200,
+                colorDark: '#d97706',
+                colorLight: '#ffffff'
+            });
+
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        function copyShareCode() {
+            const codeInput = document.getElementById('shareCode');
+            codeInput.select();
+            codeInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+
+            alert(t('codeCopied'));
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('active');
+            document.getElementById('importCode').value = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+        }
+
+        function importList() {
+            const code = document.getElementById('importCode').value.trim();
+
+            if (!code) return;
+
+            try {
+                const jsonString = decodeURIComponent(atob(code));
+                const listData = JSON.parse(jsonString);
+
+                if (listData.items && Array.isArray(listData.items)) {
+                    shoppingList = listData.items;
+                    customItems = listData.customItems || {};
+                    learnedVariants = listData.learnedVariants || {};
+
+                    saveToStorage();
+                    renderList();
+                    closeImportModal();
+
+                    alert(t('importSuccess'));
+                } else {
+                    throw new Error('Invalid format');
+                }
+            } catch (e) {
+                alert(t('importError'));
+            }
+        }
+
+        function checkUrlImport() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const importCode = urlParams.get('import');
+
+            if (importCode) {
+                try {
+                    const jsonString = decodeURIComponent(atob(importCode));
+                    const listData = JSON.parse(jsonString);
+
+                    if (listData.items && Array.isArray(listData.items)) {
+                        if (confirm(currentLanguage === 'no' ?
+                            'Vil du importere denne handlelisten?' :
+                            'Do you want to import this shopping list?')) {
+                            shoppingList = listData.items;
+                            customItems = listData.customItems || {};
+                            learnedVariants = listData.learnedVariants || {};
+
+                            saveToStorage();
+                            renderList();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Import failed:', e);
+                }
+
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
         initializeApp();
+        checkUrlImport();
     </script>
 </body>
 </html>
