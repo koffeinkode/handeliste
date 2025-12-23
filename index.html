@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handeliste 1.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            min-height: 100vh;
+            padding: 20px;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: #1d1d1f;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .language-toggle button {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #86868b;
+            min-width: auto;
+        }
+
+        .language-toggle button.active {
+            background: white;
+            color: #1d1d1f;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-toggle button:hover:not(.active) {
+            color: #1d1d1f;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            position: relative;
+            z-index: 100;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
+            font-family: inherit;
+            resize: none;
+            overflow: hidden;
+            min-height: 44px;
+            max-height: 200px;
+            line-height: 1.5;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #007AFF;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        #autocomplete {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .autocomplete-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s ease;
+        }
+
+        .autocomplete-item:hover {
+            background: rgba(0, 122, 255, 0.08);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-category {
+            font-size: 0.85em;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex: 1;
+            min-width: 150px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0051D5;
+        }
+
+        .btn-primary:active {
+            background: #004FC1;
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1d1d1f;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-secondary:active {
+            background: rgba(0, 0, 0, 0.12);
+            transform: scale(0.98);
+        }
+
+        .shopping-list {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .category {
+            margin-bottom: 24px;
+        }
+
+        .category:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-header {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-count {
+            font-size: 0.75em;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 7px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+
+        .item:hover {
+            background: rgba(0, 122, 255, 0.05);
+            border-color: rgba(0, 122, 255, 0.2);
+        }
+
+        .item.checked {
+            opacity: 0.4;
+        }
+
+        .item.checked .item-name {
+            text-decoration: line-through;
+        }
+
+        .item.highlight {
+            background: rgba(52, 199, 89, 0.15);
+            border-color: rgba(52, 199, 89, 0.3);
+            animation: fadeHighlight 3s ease-out forwards;
+        }
+
+        @keyframes fadeHighlight {
+            0% {
+                background: rgba(52, 199, 89, 0.25);
+                border-color: rgba(52, 199, 89, 0.4);
+            }
+            100% {
+                background: rgba(0, 0, 0, 0.02);
+                border-color: rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #007AFF;
+        }
+
+        .item-name {
+            flex: 1;
+            font-size: 15px;
+            color: #1d1d1f;
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: #86868b;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 400;
+            transition: all 0.15s ease;
+            min-width: auto;
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+            opacity: 1;
+        }
+
+        .delete-btn:active {
+            transform: scale(0.95);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #86868b;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1d1d1f;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1.3em;
+            cursor: pointer;
+            color: #86868b;
+            min-width: auto;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #1d1d1f;
+        }
+
+        #bulkTextarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', monospace;
+            resize: vertical;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        #bulkTextarea:focus {
+            outline: none;
+            border-color: #007AFF;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .preview-section {
+            margin-bottom: 20px;
+        }
+
+        .preview-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1d1d1f;
+            font-size: 0.95em;
+        }
+
+        .preview-items {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .preview-item {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-item-text {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .preview-item-category {
+            font-size: 0.85em;
+            color: #86868b;
+            margin-left: 10px;
+        }
+
+        .unrecognized-items {
+            margin-top: 15px;
+        }
+
+        .unrecognized-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .unrecognized-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .unrecognized-item select {
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: 100%;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .modal-header {
+                font-size: 1.3em;
+            }
+
+            .controls, .shopping-list {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="language-toggle">
+                <button onclick="setLanguage('no')" class="active" id="lang-no">NO</button>
+                <button onclick="setLanguage('en')" id="lang-en">EN</button>
+            </div>
+            <h1 id="app-title">🛒 Handeliste 1.0</h1>
+            <p class="subtitle" id="app-subtitle">Lim inn handleliste eller søk etter enkelvarer</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-container">
+                <textarea id="searchInput" rows="1" placeholder="Lim inn handleliste eller søk etter vare..."></textarea>
+                <div id="autocomplete"></div>
+            </div>
+            <div id="previewSection" style="display: none; margin-top: 16px;">
+                <div class="preview-header">Gjenkjente varer (<span id="inlineRecognizedCount">0</span>):</div>
+                <div class="preview-items" id="inlineRecognizedItems" style="margin-bottom: 12px;"></div>
+
+                <div id="inlineUnrecognizedContainer" style="display: none;">
+                    <div class="preview-header">Ukjente varer - velg kategori:</div>
+                    <div id="inlineUnrecognizedItems" style="margin-bottom: 12px;"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" id="addAllBtn" onclick="addParsedItems()" style="flex: 1;">✅ Legg til alle</button>
+                    <button class="btn-secondary" id="cancelBtn" onclick="cancelBulkInput()" style="flex: 1;">Avbryt</button>
+                </div>
+            </div>
+            <div class="button-group" style="margin-top: 12px;">
+                <button class="btn-secondary" onclick="clearList()">🗑️ Tøm liste</button>
+            </div>
+        </div>
+
+        <div class="shopping-list" id="shoppingList">
+            <div class="empty-state">
+                <div class="empty-state-icon">📝</div>
+                <p>Ingen varer lagt til ennå.</p>
+                <p style="margin-top: 10px; font-size: 0.9em;">Lim inn en liste eller søk etter enkelvarer i feltet over</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = localStorage.getItem('language') || 'no';
+
+        const TRANSLATIONS = {
+            no: {
+                appTitle: '🛒 Handeliste 1.0',
+                appSubtitle: 'Lim inn handleliste eller søk etter enkelvarer',
+                searchPlaceholder: 'Lim inn handleliste eller søk etter vare...',
+                clearListBtn: '🗑️ Tøm liste',
+                addAllBtn: '✅ Legg til alle',
+                cancelBtn: 'Avbryt',
+                recognizedItems: 'Gjenkjente varer',
+                unknownItems: 'Ukjente varer - velg kategori',
+                selectCategory: 'Velg kategori',
+                noItemsYet: 'Ingen varer lagt til ennå.',
+                noItemsDesc: 'Lim inn en liste eller søk etter enkelvarer i feltet over',
+                alertSelectCategory: 'Vennligst velg kategori for alle ukjente varer!',
+                alertConfirmClear: 'Er du sikker på at du vil tømme hele listen?',
+                alertListEmpty: 'Listen er allerede tom!',
+                categories: {
+                    'Frukt & Grønt': '🥬 Frukt & Grønt',
+                    'Kjøtt & Fisk': '🥩 Kjøtt & Fisk',
+                    'Meieri & Kjøl': '🥛 Meieri & Kjøl',
+                    'Brød & Bakervarer': '🍞 Brød & Bakervarer',
+                    'Tørrvarelager & Hermetikk': '🥫 Tørrvarelager & Hermetikk',
+                    'Fryste varer': '🧊 Fryste varer',
+                    'Urter & Krydder': '🌿 Urter & Krydder',
+                    'Drikke': '🥤 Drikke',
+                    'Godteri & Snacks': '🍬 Godteri & Snacks',
+                    'Husholdning & Rengjøring': '🧹 Husholdning & Rengjøring',
+                    'Vinmonopolet': '🍷 Vinmonopolet',
+                    'Diverse': '📦 Diverse'
+                }
+            },
+            en: {
+                appTitle: '🛒 Shopping List 1.0',
+                appSubtitle: 'Paste your list or search for items',
+                searchPlaceholder: 'Paste shopping list or search for items...',
+                clearListBtn: '🗑️ Clear list',
+                addAllBtn: '✅ Add all',
+                cancelBtn: 'Cancel',
+                recognizedItems: 'Recognized items',
+                unknownItems: 'Unknown items - select category',
+                selectCategory: 'Select category',
+                noItemsYet: 'No items added yet.',
+                noItemsDesc: 'Paste a list or search for items in the field above',
+                alertSelectCategory: 'Please select category for all unknown items!',
+                alertConfirmClear: 'Are you sure you want to clear the entire list?',
+                alertListEmpty: 'The list is already empty!',
+                categories: {
+                    'Frukt & Grønt': '🥬 Fruits & Vegetables',
+                    'Kjøtt & Fisk': '🥩 Meat & Fish',
+                    'Meieri & Kjøl': '🥛 Dairy & Refrigerated',
+                    'Brød & Bakervarer': '🍞 Bread & Bakery',
+                    'Tørrvarelager & Hermetikk': '🥫 Pantry & Canned Goods',
+                    'Fryste varer': '🧊 Frozen Foods',
+                    'Urter & Krydder': '🌿 Herbs & Spices',
+                    'Drikke': '🥤 Beverages',
+                    'Godteri & Snacks': '🍬 Candy & Snacks',
+                    'Husholdning & Rengjøring': '🧹 Household & Cleaning',
+                    'Vinmonopolet': '🍷 Liquor Store',
+                    'Diverse': '📦 Miscellaneous'
+                }
+            }
+        };
+
+        const CATEGORIES = [
+            'Frukt & Grønt',
+            'Kjøtt & Fisk',
+            'Meieri & Kjøl',
+            'Brød & Bakervarer',
+            'Tørrvarelager & Hermetikk',
+            'Fryste varer',
+            'Urter & Krydder',
+            'Drikke',
+            'Godteri & Snacks',
+            'Husholdning & Rengjøring',
+            'Vinmonopolet',
+            'Diverse'
+        ];
+
+        const DATABASE = {
+            'Frukt & Grønt': [
+                'eple', 'banan', 'appelsin', 'pære', 'drue', 'kiwi', 'mango', 'ananas', 'melon', 'vannmelon',
+                'sitron', 'lime', 'grapefrukt', 'klementiner', 'mandarin', 'persimmon', 'avokado', 'papaya',
+                'gulrot', 'tomat', 'agurk', 'paprika', 'salat', 'isbergsalat', 'ruccola', 'spinat', 'grønnkål',
+                'brokkoli', 'blomkål', 'løk', 'rødløk', 'hvitløk', 'ingefær', 'chili', 'squash', 'zucchini',
+                'purre', 'selleri', 'kålrot', 'nepe', 'rødbete', 'hodekål', 'rosenkål', 'søtpotet', 'potet',
+                'asparges', 'mais', 'erter', 'søtpotet', 'sopp', 'sjampinjong', 'østerssopp', 'kantarell'
+            ],
+            'Kjøtt & Fisk': [
+                'kyllingfilet', 'kyllinglår', 'kyllingvinger', 'hel kylling', 'kalkunfilet', 'kalkun',
+                'kjøttdeig', 'storfekjøtt', 'indrefilet', 'mørbrad', 'ytrefilet', 'entrecôte', 'storfefilet',
+                'koteletter', 'svinekoteletter', 'lammekoteletter', 'pulled pork', 'bacon', 'skinke', 'flesk',
+                'lammekjøtt', 'lammestek', 'reinsdyrskjøtt', 'elgkjøtt', 'pølser', 'grillpølser',
+                'laks', 'ørret', 'torsk', 'sei', 'hyse', 'kveite', 'makrell', 'sild', 'tunfisk', 'reker',
+                'krabbe', 'kongekrabbe', 'hummer', 'blåskjell', 'kamskjell', 'fiskeboller', 'fiskekaker', 'surimi'
+            ],
+            'Meieri & Kjøl': [
+                'melk', 'lettmelk', 'skummet melk', 'helmelk', 'ekstra lett melk', 'kulturmelk', 'kefir',
+                'fløte', 'matfløte', 'kremfløte', 'piskefløte', 'crème fraiche', 'rømme', 'lett rømme', 'kesam',
+                'yoghurt', 'gresk yoghurt', 'naturell yoghurt', 'fruktyhgurt',
+                'ost', 'hvitost', 'gulost', 'norvegia', 'jarlsberg', 'cheddar', 'mozzarella', 'parmesan',
+                'brie', 'camembert', 'feta', 'cottage cheese', 'kremost', 'smøreost', 'blåmuggost', 'geitost',
+                'smør', 'margarin', 'bremykt', 'meierismør', 'lettmargarin',
+                'egg', 'eggehvite', 'majones', 'aioli', 'remulade', 'chilimajones'
+            ],
+            'Brød & Bakervarer': [
+                'brød', 'loff', 'rundstykker', 'baguett', 'ciabatta', 'focaccia', 'grovbrød', 'kneippbrød',
+                'byggbrød', 'havregrøt', 'havrebrød', 'glutenfritt brød', 'pitabrød', 'tortilla', 'wraps',
+                'bagel', 'croissant', 'bolle', 'kanelboller', 'wienbrød', 'skolebrød', 'kaker', 'wienerbrød',
+                'knekkebrød', 'kavring', 'kornkjeks', 'kjeks', 'riskjeks', 'havregrøtmel', 'müsli', 'frokostblanding',
+                'cornflakes', 'havregryn', 'havregrynspudding', 'mandelskiver', 'mandelflak', 'sjokoladebiter', 'sjokoladedråper'
+            ],
+            'Tørrvarelager & Hermetikk': [
+                'pasta', 'spaghetti', 'makaroni', 'penne', 'fusilli', 'lasagneplater', 'tortellini', 'ravioli',
+                'ris', 'jasminris', 'basmatiris', 'risotto', 'parboiled ris', 'sushiris',
+                'mel', 'hvetemel', 'sammalt hvete', 'glutenfritt mel', 'mandelmel', 'siktet sammalt hvete',
+                'sukker', 'melis', 'flormelis', 'brunt sukker', 'rørsukker', 'honning', 'sirup', 'agavesirup',
+                'havsalt', 'bordsalt', 'pepper', 'paprika', 'karri', 'kanel', 'muskatnøtt', 'nellik',
+                'bakepulver', 'natron', 'vaniljesukker', 'vaniljestang', 'gjær', 'tørrgjær', 'kakao',
+                'hermetiske tomater', 'tomatpure', 'tomatketchup', 'hermetisk mais', 'hermetiske erter',
+                'hermetiske kikerter', 'hermetiske bønner', 'hermetisk tunfisk', 'hermetisk makrell', 'hermetisk ananas',
+                'kokosmelk', 'hermetisk kokosmelk',
+                'pesto', 'tapenade', 'olivenolje', 'rapsolje', 'kokosolje', 'smørolje', 'solsikkeolje',
+                'eddik', 'balsamicoeddik', 'rødvinseddik', 'eplesidereddik', 'soyasaus', 'fiskesaus', 'osterssaus',
+                'buljong', 'kraft', 'hønsekraft', 'grønnsakskraft', 'biff', 'peanøttsmør', 'hazelnut spread', 'nutella',
+                'syltetøy', 'jordbærsyltetøy', 'bringebærsyltetøy', 'aprikos syltetøy', 'appelsinmarmelade',
+                'müslibarer', 'proteinbarer', 'nøtter', 'mandler', 'cashewnøtter', 'peanøtter', 'hasselnøtter',
+                'rosiner', 'tørkede aprikoser', 'tørkede kranbær', 'tørket frukt'
+            ],
+            'Fryste varer': [
+                'frosne erter', 'frosne grønnsaker', 'frosne grønnsaksblandinger', 'frosne bær', 'frosne jordbær',
+                'frosne blåbær', 'frosne bringebær', 'frosne tyttebær', 'frosne mango', 'frosne bærblandinger',
+                'pizza', 'grandiosa', 'ferdigmat', 'lasagne', 'fiskegrateng', 'pytt i panne', 'tacokjøtt',
+                'is', 'iskrem', 'sorbét', 'pinneis', 'ispinne', 'isvafler',
+                'pommes frites', 'potetbåter', 'potetskiver', 'kroketter', 'fiskefileter', 'fiskepinner',
+                'panert fisk', 'frossenpudding'
+            ],
+            'Urter & Krydder': [
+                'salt', 'pepper', 'basilikum', 'oregano', 'timian', 'rosmarin', 'persille', 'koriander',
+                'dill', 'gressløk', 'mynta', 'salvie', 'estragon', 'laurbærblad', 'karri', 'karripasta',
+                'kurkuma', 'spisskummen', 'koriafrø', 'chiliflak', 'chipotle', 'cayennepepper',
+                'paprikapulver', 'søt paprika', 'røkt paprika', 'hvitløkspulver', 'løkpulver',
+                'muskatnøtt', 'kardemomme', 'nellik', 'stjerneanis', 'kanel', 'vaniljesukker', 'ingefær',
+                'sesamfrø', 'valmuefrø', 'solsikkefrø', 'gresskarkjerner', 'chiafrø', 'linfrø'
+            ],
+            'Drikke': [
+                'vann', 'kildevann', 'kullsyreholdig vann', 'mineralvann', 'brus', 'cola', 'solo', 'fanta',
+                'sprite', 'pepsi', 'saft', 'eplejuice', 'appelsinjuice', 'juice', 'smoothie',
+                'kaffe', 'kafebønner', 'filterkaffe', 'espresso', 'te', 'grønn te', 'svart te', 'urte te',
+                'kakao', 'sjokolademelk', 'energidrikk', 'sportsdrikk', 'proteinshake', 'kokosvann',
+                'øl', 'pilsner', 'lager', 'alkoholfri øl', 'alkoholfri vin', 'lettøl'
+            ],
+            'Godteri & Snacks': [
+                'sjokolade', 'melkesjokolade', 'mørk sjokolade', 'kvikk lunsj', 'stratos', 'freia melkesjokolade',
+                'twist', 'smash', 'non stop', 'center', 'marianne', 'drops', 'mintedropser',
+                'godteri', 'vingummi', 'gelé', 'lakris', 'salt lakris', 'søt lakris', 'lollipop', 'pastiller',
+                'tyggis', 'popcorn', 'mikropopcorn', 'chips', 'potetchips', 'sørlandschips', 'maarud',
+                'nachos', 'tortillachips', 'salsa', 'guacamole', 'dipp', 'peanøtter', 'salte peanøtter',
+                'cashewnøtter', 'nøtteblanding', 'studenthaver', 'trail mix', 'kjeks', 'småkjeks',
+                'sørlandskjeks', 'digestive', 'ballerina', 'havrekjeks'
+            ],
+            'Husholdning & Rengjøring': [
+                'oppvaskmiddel', 'oppvaskmaskinmiddel', 'oppvaskmaskin tabletter', 'oppvaskbørste', 'oppvaskklut',
+                'tørk', 'rengjøring', 'allrens', 'såpe', 'såpepumpe', 'toalettpapir', 'dopapir', 'kjøkkenruller',
+                'papirhåndkle', 'servietter', 'våtservietter', 'kluter', 'filler', 'svamp', 'skuresvamp',
+                'skurepulver', 'klorin', 'klorkluter', 'desinfeksjon', 'gulvvask', 'vindusrens', 'glassrens',
+                'badrens', 'kalkfjerner', 'universal rengjøringsmiddel', 'ovnsrens', 'komfyrrens',
+                'tøyvask', 'vaskemiddel', 'flytende vaskemiddel', 'tøymykner', 'fargeark', 'vaskepulver',
+                'såpeflak', 'flekktjerner', 'blekmiddel', 'uldvask',
+                'søppelposer', 'matposer', 'fryseposer', 'brødposer', 'aluminiumsfolie', 'plastfolie', 'bakepapir'
+            ],
+            'Vinmonopolet': [
+                'sterkøl', 'ipa', 'pale ale', 'stout', 'porter', 'brown ale', 'wheat beer', 'witbier',
+                'vin', 'rødvin', 'hvitvin', 'rosévin', 'musserende vin', 'champagne', 'prosecco', 'cava',
+                'cider', 'eplesider', 'pærecider',
+                'brennevin', 'vodka', 'whisky', 'gin', 'rom', 'tequila', 'cognac', 'likør', 'baileys', 'kahlua',
+                'aperol', 'campari', 'vermut', 'sherry', 'portvin', 'madeira'
+            ],
+            'Diverse': [
+                'gavepapir', 'gavepose', 'gavebånd', 'sløyfe', 'gave etikett', 'kort', 'bursdagskort',
+                'gratulasjonskort', 'takkekort', 'invitasjon', 'konvolutt', 'ballonger', 'servietter',
+                'festservietter', 'papirbord', 'papptallerkener', 'plastkopper', 'papirkopper', 'sugerør',
+                'festpynt', 'girlander', 'vimpel', 'konfetti', 'stearinlys', 'telys', 'festlys', 'kakedekorasjon'
+            ]
+        };
+
+        let shoppingList = [];
+        let customItems = {};
+        let learnedVariants = {};
+        let lastAddedItemId = null;
+        let lastAddedCategory = null;
+
+        const FILLER_WORDS = [
+            'kan', 'du', 'handle', 'kjøpe', 'hente', 'få', 'tak', 'i', 'trenger', 'må', 'ha',
+            'litt', 'noe', 'noen', 'en', 'et', 'ei', 'og', 'eller', 'også', 'takk', 'tusen', 'vennligst',
+            'gjerne', 'kanskje', 'om', 'mulig', 'hvis', 'dersom', 'når', 'hei', 'hallo', 'hey'
+        ];
+
+        const ADJECTIVES = [
+            'økologisk', 'økologiske', 'fersk', 'ferske', 'frossen', 'frosne', 'fryste', 'fryst',
+            'hermetisk', 'hermetiske', 'lett', 'lette', 'ekstra', 'hel', 'hele', 'helle',
+            'skåret', 'skårne', 'hakket', 'hakkede', 'rød', 'røde', 'grønn', 'grønne',
+            'gul', 'gule', 'hvit', 'hvite', 'blå', 'norsk', 'norske', 'italiensk', 'italienske',
+            'stor', 'store', 'liten', 'små', 'lang', 'lange', 'kort', 'korte', 'fin', 'fine',
+            'god', 'gode', 'beste', 'billig', 'billige', 'dyr', 'dyre', 'ny', 'nye', 'gammel', 'gamle'
+        ];
+
+        function initializeApp() {
+            loadFromStorage();
+
+            // Set initial language button state
+            document.getElementById('lang-no').classList.toggle('active', currentLanguage === 'no');
+            document.getElementById('lang-en').classList.toggle('active', currentLanguage === 'en');
+
+            updateUI();
+            renderList();
+            setupSearchListeners();
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+
+            document.getElementById('lang-no').classList.toggle('active', lang === 'no');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+            updateUI();
+            renderList();
+        }
+
+        function t(key) {
+            const keys = key.split('.');
+            let value = TRANSLATIONS[currentLanguage];
+            for (const k of keys) {
+                value = value[k];
+            }
+            return value || key;
+        }
+
+        function updateUI() {
+            document.getElementById('app-title').textContent = t('appTitle');
+            document.getElementById('app-subtitle').textContent = t('appSubtitle');
+            document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+
+            const clearBtn = document.querySelector('.button-group button');
+            if (clearBtn) clearBtn.textContent = t('clearListBtn');
+
+            const addAllBtn = document.getElementById('addAllBtn');
+            if (addAllBtn) addAllBtn.textContent = t('addAllBtn');
+
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) cancelBtn.textContent = t('cancelBtn');
+        }
+
+        function setupSearchListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const autocomplete = document.getElementById('autocomplete');
+
+            // Auto-resize textarea
+            searchInput.addEventListener('input', (e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+
+                const text = e.target.value;
+                const isBulkInput = detectBulkInput(text);
+
+                if (isBulkInput) {
+                    autocomplete.style.display = 'none';
+                    handleBulkInput(text);
+                } else {
+                    document.getElementById('previewSection').style.display = 'none';
+                    const query = text.trim();
+                    if (query.length > 0) {
+                        showAutocomplete(query);
+                    } else {
+                        autocomplete.style.display = 'none';
+                    }
+                }
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const text = e.target.value.trim();
+
+                    if (detectBulkInput(text)) {
+                        return;
+                    }
+
+                    if (text) {
+                        addItem(text);
+                        e.target.value = '';
+                        e.target.style.height = 'auto';
+                        autocomplete.style.display = 'none';
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !autocomplete.contains(e.target)) {
+                    autocomplete.style.display = 'none';
+                }
+            });
+        }
+
+        function detectBulkInput(text) {
+            const lines = text.split('\n').filter(l => l.trim().length > 0);
+            const hasMultipleLines = lines.length > 1;
+            const hasMultipleCommas = (text.match(/,/g) || []).length >= 2;
+            return hasMultipleLines || hasMultipleCommas;
+        }
+
+        let currentParsedItems = [];
+
+        function handleBulkInput(text) {
+            const items = parseText(text);
+            currentParsedItems = [];
+            const recognized = [];
+            const unrecognized = [];
+
+            items.forEach(item => {
+                const normalized = normalizeText(item);
+
+                if (learnedVariants[normalized]) {
+                    recognized.push({ text: item, category: learnedVariants[normalized].category });
+                    currentParsedItems.push({ text: item, category: learnedVariants[normalized].category });
+                } else {
+                    const match = findBestMatch(normalized);
+                    if (match) {
+                        recognized.push({ text: item, category: match.category });
+                        currentParsedItems.push({ text: item, category: match.category });
+                        learnedVariants[normalized] = { original: match.item, category: match.category };
+                    } else {
+                        unrecognized.push(item);
+                        currentParsedItems.push({ text: item, category: null });
+                    }
+                }
+            });
+
+            displayInlinePreview(recognized, unrecognized);
+        }
+
+        function displayInlinePreview(recognized, unrecognized) {
+            const previewSection = document.getElementById('previewSection');
+            const recognizedItems = document.getElementById('inlineRecognizedItems');
+            const recognizedCount = document.getElementById('inlineRecognizedCount');
+            const unrecognizedContainer = document.getElementById('inlineUnrecognizedContainer');
+            const unrecognizedItems = document.getElementById('inlineUnrecognizedItems');
+
+            document.querySelector('#previewSection .preview-header').innerHTML = `${t('recognizedItems')} (<span id="inlineRecognizedCount">${recognized.length}</span>):`;
+
+            recognizedItems.innerHTML = recognized.map(item => `
+                <div class="preview-item">
+                    <span class="preview-item-text">${item.text}</span>
+                    <span class="preview-item-category">→ ${t('categories.' + item.category)}</span>
+                </div>
+            `).join('') || `<p style="color: #86868b;">${currentLanguage === 'no' ? 'Ingen gjenkjente varer' : 'No recognized items'}</p>`;
+
+            if (unrecognized.length > 0) {
+                unrecognizedContainer.style.display = 'block';
+                document.querySelector('#inlineUnrecognizedContainer .preview-header').textContent = t('unknownItems') + ':';
+                unrecognizedItems.innerHTML = unrecognized.map((item, index) => `
+                    <div class="unrecognized-item">
+                        <input type="text" value="${item}" readonly>
+                        <select id="inline-category-${index}">
+                            <option value="">${t('selectCategory')}</option>
+                            ${CATEGORIES.map(cat => `<option value="${cat}">${t('categories.' + cat)}</option>`).join('')}
+                        </select>
+                    </div>
+                `).join('');
+            } else {
+                unrecognizedContainer.style.display = 'none';
+            }
+
+            previewSection.style.display = 'block';
+        }
+
+        function addParsedItems() {
+            const unrecognizedSelects = document.querySelectorAll('[id^="inline-category-"]');
+            let allCategoriesSelected = true;
+
+            unrecognizedSelects.forEach((select, index) => {
+                const category = select.value;
+                if (!category) {
+                    allCategoriesSelected = false;
+                } else {
+                    const itemIndex = currentParsedItems.findIndex(item => item.category === null);
+                    if (itemIndex !== -1) {
+                        currentParsedItems[itemIndex].category = category;
+                        const itemText = currentParsedItems[itemIndex].text;
+                        customItems[itemText] = category;
+                        learnedVariants[normalizeText(itemText)] = { original: itemText, category };
+                    }
+                }
+            });
+
+            if (!allCategoriesSelected) {
+                alert(t('alertSelectCategory'));
+                return;
+            }
+
+            currentParsedItems.forEach(item => {
+                if (item.category) {
+                    addItemToList(item.text, item.category);
+                }
+            });
+
+            saveToStorage();
+            cancelBulkInput();
+        }
+
+        function cancelBulkInput() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').style.height = 'auto';
+            document.getElementById('previewSection').style.display = 'none';
+            currentParsedItems = [];
+        }
+
+        function showAutocomplete(query) {
+            const autocomplete = document.getElementById('autocomplete');
+            const matches = findMatches(query);
+
+            if (matches.length === 0) {
+                autocomplete.style.display = 'none';
+                return;
+            }
+
+            autocomplete.innerHTML = matches.slice(0, 8).map(match => `
+                <div class="autocomplete-item" onclick="selectAutocomplete('${match.item}', '${match.category}')">
+                    <span>${match.item}</span>
+                    <span class="autocomplete-category">${match.category}</span>
+                </div>
+            `).join('');
+
+            autocomplete.style.display = 'block';
+        }
+
+        function findMatches(query) {
+            const normalizedQuery = normalizeText(query).toLowerCase();
+            const matches = [];
+
+            for (const [category, items] of Object.entries(DATABASE)) {
+                for (const item of items) {
+                    if (normalizeText(item).toLowerCase().includes(normalizedQuery)) {
+                        matches.push({ item, category });
+                    }
+                }
+            }
+
+            for (const [item, category] of Object.entries(customItems)) {
+                if (normalizeText(item).toLowerCase().includes(normalizedQuery)) {
+                    matches.push({ item, category });
+                }
+            }
+
+            for (const [variant, data] of Object.entries(learnedVariants)) {
+                if (normalizeText(variant).toLowerCase().includes(normalizedQuery)) {
+                    matches.push({ item: variant, category: data.category });
+                }
+            }
+
+            return matches;
+        }
+
+        function selectAutocomplete(item, category) {
+            addItemToList(item, category);
+            document.getElementById('searchInput').value = '';
+            document.getElementById('autocomplete').style.display = 'none';
+        }
+
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .replace(/[^a-zæøå0-9\s]/gi, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function addItem(userInput) {
+            const normalized = normalizeText(userInput);
+
+            if (learnedVariants[normalized]) {
+                addItemToList(userInput, learnedVariants[normalized].category);
+                return;
+            }
+
+            const match = findBestMatch(normalized);
+
+            if (match) {
+                addItemToList(userInput, match.category);
+                learnedVariants[normalized] = { original: match.item, category: match.category };
+                saveToStorage();
+            } else {
+                askUserForCategory(userInput);
+            }
+        }
+
+        function findBestMatch(normalized) {
+            const words = normalized.split(' ').filter(w => !FILLER_WORDS.includes(w));
+            const cleanedWords = words.filter(w => !ADJECTIVES.includes(w) && !/^\d+$/.test(w) && !/^\d+[a-z]+$/.test(w));
+            const searchTerms = cleanedWords.length > 0 ? cleanedWords : words;
+
+            for (const term of searchTerms) {
+                for (const [category, items] of Object.entries(DATABASE)) {
+                    for (const item of items) {
+                        const normalizedItem = normalizeText(item);
+                        if (normalizedItem === term || normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                            return { item, category };
+                        }
+                    }
+                }
+
+                for (const [item, category] of Object.entries(customItems)) {
+                    const normalizedItem = normalizeText(item);
+                    if (normalizedItem === term || normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                        return { item, category };
+                    }
+                }
+            }
+
+            for (const term of searchTerms) {
+                const singular = term.endsWith('er') ? term.slice(0, -2) : term;
+                const plural = term + 'er';
+
+                for (const [category, items] of Object.entries(DATABASE)) {
+                    for (const item of items) {
+                        const normalizedItem = normalizeText(item);
+                        if (normalizedItem === singular || normalizedItem === plural ||
+                            normalizedItem.includes(singular) || normalizedItem.includes(plural)) {
+                            return { item, category };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function askUserForCategory(item) {
+            const category = prompt(`Hvilken kategori hører "${item}" til?\n\nTilgjengelige kategorier:\n${CATEGORIES.map((c, i) => `${i + 1}. ${c}`).join('\n')}\n\nSkriv inn nummer (1-${CATEGORIES.length}):`);
+
+            if (category !== null) {
+                const categoryIndex = parseInt(category) - 1;
+                if (categoryIndex >= 0 && categoryIndex < CATEGORIES.length) {
+                    const selectedCategory = CATEGORIES[categoryIndex];
+                    customItems[item] = selectedCategory;
+                    addItemToList(item, selectedCategory);
+                    saveToStorage();
+                }
+            }
+        }
+
+        function addItemToList(name, category) {
+            const existingItem = shoppingList.find(item =>
+                normalizeText(item.name) === normalizeText(name) && item.category === category
+            );
+
+            if (!existingItem) {
+                let displayName = name;
+
+                const strongBeerTypes = ['ipa', 'stout', 'porter', 'brown ale', 'pale ale', 'wheat beer', 'witbier', 'sterkøl'];
+                const normalizedName = normalizeText(name);
+
+                if (category === 'Vinmonopolet' && strongBeerTypes.some(type => normalizedName.includes(type))) {
+                    if (!name.includes('(mulig polet)') && !normalizedName.includes('sterkøl')) {
+                        displayName = `${name} (mulig polet)`;
+                    }
+                }
+
+                const newItemId = Date.now() + Math.random();
+                shoppingList.push({
+                    id: newItemId,
+                    name: displayName,
+                    category,
+                    checked: false
+                });
+
+                // Set last added item for highlighting
+                lastAddedItemId = newItemId;
+                lastAddedCategory = category;
+
+                saveToStorage();
+                renderList();
+
+                // Clear highlight after animation
+                setTimeout(() => {
+                    lastAddedItemId = null;
+                }, 3000);
+            }
+        }
+
+        function toggleItem(id) {
+            const item = shoppingList.find(item => item.id === id);
+            if (item) {
+                item.checked = !item.checked;
+                saveToStorage();
+                renderList();
+            }
+        }
+
+        function deleteItem(id) {
+            shoppingList = shoppingList.filter(item => item.id !== id);
+            saveToStorage();
+            renderList();
+        }
+
+        function clearList() {
+            if (shoppingList.length === 0) {
+                alert(t('alertListEmpty'));
+                return;
+            }
+
+            if (confirm(t('alertConfirmClear'))) {
+                shoppingList = [];
+                saveToStorage();
+                renderList();
+            }
+        }
+
+        function renderList() {
+            const container = document.getElementById('shoppingList');
+
+            if (shoppingList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>${t('noItemsYet')}</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">${t('noItemsDesc')}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const grouped = {};
+            CATEGORIES.forEach(cat => {
+                grouped[cat] = shoppingList.filter(item => item.category === cat);
+            });
+
+            // Sort categories to show the last added category first
+            const sortedCategories = [...CATEGORIES].sort((a, b) => {
+                if (a === lastAddedCategory) return -1;
+                if (b === lastAddedCategory) return 1;
+                return 0;
+            });
+
+            container.innerHTML = sortedCategories.map(category => {
+                const items = grouped[category];
+                if (items.length === 0) return '';
+
+                const itemsHtml = items.map(item => {
+                    const isHighlighted = item.id === lastAddedItemId;
+                    return `
+                        <div class="item ${item.checked ? 'checked' : ''} ${isHighlighted ? 'highlight' : ''}" onclick="toggleItem(${item.id})">
+                            <input type="checkbox" ${item.checked ? 'checked' : ''}>
+                            <span class="item-name">${item.name}</span>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteItem(${item.id})">×</button>
+                        </div>
+                    `;
+                }).join('');
+
+                const itemWord = currentLanguage === 'no' ?
+                    (items.length !== 1 ? 'varer' : 'vare') :
+                    (items.length !== 1 ? 'items' : 'item');
+
+                return `
+                    <div class="category">
+                        <div class="category-header">
+                            <span>${t('categories.' + category)}</span>
+                            <span class="category-count">${items.length} ${itemWord}</span>
+                        </div>
+                        <div class="items-list">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+
+        function parseText(text) {
+            let items = [];
+
+            text = text.replace(/\d+\.\s*/g, '\n');
+            text = text.replace(/[-•]\s*/g, '\n');
+
+            const lines = text.split('\n');
+
+            lines.forEach(line => {
+                if (line.includes(',')) {
+                    items.push(...line.split(','));
+                } else {
+                    items.push(line);
+                }
+            });
+
+            items = items.map(item => {
+                item = item.replace(/\b\d+\s*(kg|g|l|ml|stk|pk|boks|pose|brett|pakke)?\b/gi, '');
+                item = item.replace(/[^\wæøåÆØÅ\s]/g, ' ');
+                return item.trim();
+            }).filter(item => {
+                const words = item.toLowerCase().split(' ');
+                return item.length > 0 && !words.every(w => FILLER_WORDS.includes(w));
+            });
+
+            return items;
+        }
+
+
+        function saveToStorage() {
+            localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+            localStorage.setItem('customItems', JSON.stringify(customItems));
+            localStorage.setItem('learnedVariants', JSON.stringify(learnedVariants));
+        }
+
+        function loadFromStorage() {
+            const savedList = localStorage.getItem('shoppingList');
+            const savedCustom = localStorage.getItem('customItems');
+            const savedVariants = localStorage.getItem('learnedVariants');
+
+            if (savedList) shoppingList = JSON.parse(savedList);
+            if (savedCustom) customItems = JSON.parse(savedCustom);
+            if (savedVariants) learnedVariants = JSON.parse(savedVariants);
+        }
+
+        initializeApp();
+    </script>
+</body>
+</html>
