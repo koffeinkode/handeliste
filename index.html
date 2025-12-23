@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Handeliste 1.0</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.1);
+
+            --secondary: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,8 +27,13 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f7;
+            font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(255, 110, 127, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(52, 199, 168, 0.10) 0%, transparent 60%),
+                linear-gradient(135deg, #fafbfc 0%, #e8ecf2 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             padding: 20px;
             color: #1d1d1f;
@@ -22,7 +42,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
@@ -68,10 +88,15 @@
         }
 
         h1 {
-            font-size: 2.5em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3em;
             margin-bottom: 8px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
@@ -80,15 +105,34 @@
             font-weight: 400;
         }
 
+        .adhd-explanation {
+            background: linear-gradient(135deg, rgba(103, 58, 183, 0.08), rgba(63, 81, 181, 0.08));
+            border: 1px solid rgba(103, 58, 183, 0.15);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 0 auto 24px auto;
+            max-width: 1100px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .adhd-explanation strong {
+            color: #5e35b1;
+            font-weight: 600;
+        }
+
         .controls {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow:
+                0 8px 32px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
             position: relative;
             z-index: 100;
         }
@@ -116,9 +160,9 @@
 
         #searchInput:focus {
             outline: none;
-            border-color: #007AFF;
+            border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
         #autocomplete {
@@ -149,7 +193,7 @@
         }
 
         .autocomplete-item:hover {
-            background: rgba(0, 122, 255, 0.08);
+            background: var(--primary-light);
         }
 
         .autocomplete-item:last-child {
@@ -182,16 +226,16 @@
         }
 
         .btn-primary {
-            background: #007AFF;
+            background: var(--primary);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #0051D5;
+            background: var(--primary-hover);
         }
 
         .btn-primary:active {
-            background: #004FC1;
+            background: var(--primary-hover);
             transform: scale(0.98);
         }
 
@@ -211,13 +255,15 @@
         }
 
         .shopping-list {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow:
+                0 8px 32px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
         .category {
@@ -229,8 +275,10 @@
         }
 
         .category-header {
-            font-size: 1.1em;
-            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
             color: #1d1d1f;
             margin-bottom: 12px;
             padding-bottom: 8px;
@@ -265,8 +313,8 @@
         }
 
         .item:hover {
-            background: rgba(0, 122, 255, 0.05);
-            border-color: rgba(0, 122, 255, 0.2);
+            background: var(--primary-light);
+            border-color: var(--primary);
         }
 
         .item.checked {
@@ -298,7 +346,7 @@
             width: 20px;
             height: 20px;
             cursor: pointer;
-            accent-color: #007AFF;
+            accent-color: var(--primary);
         }
 
         .item-name {
@@ -430,9 +478,9 @@
 
         #bulkTextarea:focus {
             outline: none;
-            border-color: #007AFF;
+            border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
         .preview-section {
@@ -512,13 +560,41 @@
             margin-top: 20px;
         }
 
+        @media (min-width: 900px) {
+            .shopping-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 16px;
             }
 
+            header {
+                display: grid;
+                grid-template-areas:
+                    "lang"
+                    "title"
+                    "subtitle";
+                gap: 12px;
+            }
+
+            .language-toggle {
+                position: static;
+                grid-area: lang;
+                justify-self: center;
+            }
+
             h1 {
                 font-size: 2em;
+                grid-area: title;
+            }
+
+            .subtitle {
+                grid-area: subtitle;
             }
 
             .button-group {
@@ -553,6 +629,10 @@
             <h1 id="app-title">🛒 Handeliste 1.0</h1>
             <p class="subtitle" id="app-subtitle">Lim inn handleliste eller søk etter enkelvarer</p>
         </header>
+
+        <div class="adhd-explanation">
+            <p id="adhd-text"></p>
+        </div>
 
         <div class="controls">
             <div class="search-container">
@@ -606,6 +686,7 @@
                 alertSelectCategory: 'Vennligst velg kategori for alle ukjente varer!',
                 alertConfirmClear: 'Er du sikker på at du vil tømme hele listen?',
                 alertListEmpty: 'Listen er allerede tom!',
+                adhdExplanation: '<strong>En ADHD-vennlig handleliste</strong> - Lim inn en formatert handleliste/melding du har fått fra noen andre, og Handlelisten vil sortere ut varer basert på kategorier automatisk for enklere handleturer',
                 categories: {
                     'Frukt & Grønt': '🥬 Frukt & Grønt',
                     'Kjøtt & Fisk': '🥩 Kjøtt & Fisk',
@@ -618,6 +699,12 @@
                     'Godteri & Snacks': '🍬 Godteri & Snacks',
                     'Husholdning & Rengjøring': '🧹 Husholdning & Rengjøring',
                     'Vinmonopolet': '🍷 Vinmonopolet',
+                    'Kontorartikler': '📎 Kontorartikler',
+                    'Møbelbutikk': '🛋️ Møbelbutikk',
+                    'Skredder': '🧵 Skredder',
+                    'Bensinstasjon': '⛽ Bensinstasjon',
+                    'Kaffebar/Kafeer': '☕ Kaffebar/Kafeer',
+                    'Post': '📮 Post',
                     'Diverse': '📦 Diverse'
                 }
             },
@@ -636,6 +723,7 @@
                 alertSelectCategory: 'Please select category for all unknown items!',
                 alertConfirmClear: 'Are you sure you want to clear the entire list?',
                 alertListEmpty: 'The list is already empty!',
+                adhdExplanation: '<strong>An ADHD-friendly shopping list</strong> - Paste a formatted shopping list or message from someone else, and the app will automatically sort items by category for easier shopping trips',
                 categories: {
                     'Frukt & Grønt': '🥬 Fruits & Vegetables',
                     'Kjøtt & Fisk': '🥩 Meat & Fish',
@@ -648,6 +736,12 @@
                     'Godteri & Snacks': '🍬 Candy & Snacks',
                     'Husholdning & Rengjøring': '🧹 Household & Cleaning',
                     'Vinmonopolet': '🍷 Liquor Store',
+                    'Kontorartikler': '📎 Office Supplies',
+                    'Møbelbutikk': '🛋️ Furniture Store',
+                    'Skredder': '🧵 Tailor',
+                    'Bensinstasjon': '⛽ Gas Station',
+                    'Kaffebar/Kafeer': '☕ Coffee Shop',
+                    'Post': '📮 Post Office',
                     'Diverse': '📦 Miscellaneous'
                 }
             }
@@ -665,6 +759,12 @@
             'Godteri & Snacks',
             'Husholdning & Rengjøring',
             'Vinmonopolet',
+            'Kontorartikler',
+            'Møbelbutikk',
+            'Skredder',
+            'Bensinstasjon',
+            'Kaffebar/Kafeer',
+            'Post',
             'Diverse'
         ];
 
@@ -767,11 +867,218 @@
                 'brennevin', 'vodka', 'whisky', 'gin', 'rom', 'tequila', 'cognac', 'likør', 'baileys', 'kahlua',
                 'aperol', 'campari', 'vermut', 'sherry', 'portvin', 'madeira'
             ],
+            'Kontorartikler': [
+                'kulepenn', 'blyant', 'viskelær', 'notisblokk', 'post-it', 'lapper', 'ringperm', 'plastlommer',
+                'clips', 'binders', 'stifter', 'stiftepistol', 'hullmaskin', 'teip', 'tape', 'dobbeltsidig tape',
+                'kalkulator', 'saks', 'kontorsaks', 'linjal', 'lim', 'limstift', 'tusj', 'marker', 'highlighter',
+                'A4 papir', 'skrivepapir', 'konvolutt', 'hvite konvolutter', 'brune konvolutter', 'etiketter',
+                'merkelapper', 'batterier', 'AA batterier', 'AAA batterier', 'USB kabel', 'USB minne', 'ladekabel'
+            ],
+            'Møbelbutikk': [
+                'lyspære', 'LED pære', 'sparepære', 'halogen pære', 'E27 pære', 'E14 pære', 'GU10 pære',
+                'stueplanter', 'potteplanter', 'blomsterpotte', 'blomsterkrukke', 'plantepotte', 'kaktus',
+                'pute', 'sofapute', 'prydspute', 'putevår', 'pledd', 'ullteppe', 'fleeceteppe',
+                'gardin', 'persienne', 'rullegardin', 'gardinkrok', 'gardinhengsler', 'gardinstang',
+                'bilderamme', 'fotoramme', 'veggdekor', 'speil', 'veggspeil',
+                'stearinlys', 'tente lys', 'duftlys', 'fyrfadslys', 'kubbelys', 'kronelys', 'lighter', 'fyrstikker',
+                'kurv', 'oppbevaringskurv', 'flettekurv', 'vase', 'glassvase', 'keramikvase',
+                'matte', 'teppe', 'dørmatte', 'badematte', 'teppeunderlag'
+            ],
+            'Skredder': [
+                'tråd', 'symaskintråd', 'bomullstråd', 'polyestertråd', 'nål', 'synål', 'håndsynål', 'maskinnål',
+                'knapp', 'knapper', 'trykknapp', 'glidelås', 'lynlås', 'saks', 'stoffsaks', 'trådsaks',
+                'målebånd', 'symeterbånd', 'stoppetråd', 'ulltråd', 'garn', 'strikketøy', 'strikkegarn',
+                'strikkepinner', 'rundpinner', 'heklenål', 'knappenål', 'sikkerhetsnål', 'sømriper',
+                'stoff', 'bomullsstoff', 'jersey', 'fleece', 'filterstoff'
+            ],
+            'Bensinstasjon': [
+                'bensin', '95 oktan', '98 oktan', 'diesel', 'biodiesel', 'spylevæske', 'vindusspylevæske',
+                'motorolje', 'bilstell', 'bilshampoo', 'issskrape', 'isskrape', 'ispray', 'aviser',
+                'luftfrisker bil', 'bilparfyme', 'bilduft', 'vaskeklut', 'bilklut', 'mikrofiberklut',
+                'kaffe', 'varm pølse', 'pølse', 'varmmat', 'nachos', 'energidrikk', 'redbull', 'battery',
+                'lightere', 'isbit', 'energibar', 'kjølevæske', 'bremsevæske', 'startkabler'
+            ],
+            'Kaffebar/Kafeer': [
+                'espresso', 'dobbel espresso', 'americano', 'latte', 'cappuccino', 'flat white', 'cortado',
+                'macchiato', 'mocha', 'iskaffe', 'iced latte', 'cold brew', 'frappé', 'kaffe', 'filterkaffe',
+                'te', 'chai latte', 'matcha latte', 'varm sjokolade', 'kakao', 'iste',
+                'croissant', 'smørcroissant', 'sjokoladecroissant', 'mandelcroissant',
+                'kanelbolle', 'kanelsnurr', 'skillingsbolle', 'bolle', 'wienerbrød', 'kardemommebolle',
+                'muffins', 'blåbærmuffins', 'sjokolademuffins', 'brownie', 'cookies', 'sjokoladekjeks',
+                'sandwich', 'toast', 'panini', 'wrap', 'salat', 'suppe', 'quiche',
+                'smoothie', 'juice', 'friskpresset juice', 'yoghurt', 'havregrøt', 'granola',
+                'havrmelk', 'soyamelk', 'mandelmelk', 'kokosmelk', 'melkealternativ', 'ekstra shot', 'sirup'
+            ],
+            'Post': [
+                'frimerke', 'frimerker', 'A-post frimerke', 'B-post frimerke', 'porto', 'portosats',
+                'konvolutt', 'C5 konvolutt', 'C4 konvolutt', 'boblekonvolutt', 'luftekonvolutt',
+                'pakketape', 'brunt tape', 'emballasjeteip', 'pakkepapir', 'bobleplast',
+                'eske', 'pappkasse', 'pappeske', 'pakkelapp', 'adresseetikett', 'adresselapp',
+                'tollpapir', 'tolldeklarasjon', 'CN23', 'avsenderlapp', 'returlapp',
+                'blyant', 'brevvekt', 'plastpose', 'pakkepose', 'postsekk'
+            ],
             'Diverse': [
                 'gavepapir', 'gavepose', 'gavebånd', 'sløyfe', 'gave etikett', 'kort', 'bursdagskort',
                 'gratulasjonskort', 'takkekort', 'invitasjon', 'konvolutt', 'ballonger', 'servietter',
                 'festservietter', 'papirbord', 'papptallerkener', 'plastkopper', 'papirkopper', 'sugerør',
                 'festpynt', 'girlander', 'vimpel', 'konfetti', 'stearinlys', 'telys', 'festlys', 'kakedekorasjon'
+            ]
+        };
+
+        const DATABASE_EN = {
+            'Frukt & Grønt': [
+                'apple', 'banana', 'orange', 'pear', 'grape', 'kiwi', 'mango', 'pineapple', 'melon', 'watermelon',
+                'lemon', 'lime', 'grapefruit', 'clementine', 'mandarin', 'persimmon', 'avocado', 'papaya',
+                'carrot', 'tomato', 'cucumber', 'bell pepper', 'lettuce', 'iceberg lettuce', 'arugula', 'spinach', 'kale',
+                'broccoli', 'cauliflower', 'onion', 'red onion', 'garlic', 'ginger', 'chili', 'squash', 'zucchini',
+                'leek', 'celery', 'rutabaga', 'turnip', 'beetroot', 'cabbage', 'brussels sprouts', 'sweet potato', 'potato',
+                'asparagus', 'corn', 'peas', 'yam', 'mushroom', 'button mushroom', 'oyster mushroom', 'chanterelle'
+            ],
+            'Kjøtt & Fisk': [
+                'chicken breast', 'chicken thighs', 'chicken wings', 'whole chicken', 'turkey breast', 'turkey',
+                'ground beef', 'beef', 'tenderloin', 'pork tenderloin', 'sirloin', 'ribeye', 'beef fillet',
+                'chops', 'pork chops', 'lamb chops', 'pulled pork', 'bacon', 'ham', 'pork',
+                'lamb', 'lamb roast', 'reindeer meat', 'venison', 'sausages', 'grilling sausages',
+                'salmon', 'trout', 'cod', 'saithe', 'haddock', 'halibut', 'mackerel', 'herring', 'tuna', 'shrimp',
+                'crab', 'king crab', 'lobster', 'mussels', 'scallops', 'fish balls', 'fish cakes', 'surimi'
+            ],
+            'Meieri & Kjøl': [
+                'milk', 'low fat milk', 'skim milk', 'whole milk', 'extra light milk', 'cultured milk', 'kefir',
+                'cream', 'cooking cream', 'double cream', 'whipping cream', 'crème fraiche', 'sour cream', 'light sour cream', 'cottage cheese',
+                'yogurt', 'greek yogurt', 'natural yogurt', 'fruit yogurt',
+                'cheese', 'white cheese', 'yellow cheese', 'norvegia', 'jarlsberg', 'cheddar', 'mozzarella', 'parmesan',
+                'brie', 'camembert', 'feta', 'cottage cheese', 'cream cheese', 'spread cheese', 'blue cheese', 'goat cheese',
+                'butter', 'margarine', 'soft margarine', 'dairy butter', 'light margarine',
+                'eggs', 'egg whites', 'mayonnaise', 'aioli', 'remoulade', 'chili mayonnaise'
+            ],
+            'Brød & Bakervarer': [
+                'bread', 'white bread', 'rolls', 'baguette', 'ciabatta', 'focaccia', 'whole grain bread', 'rye bread',
+                'barley bread', 'oat porridge', 'oat bread', 'gluten free bread', 'pita bread', 'tortilla', 'wraps',
+                'bagel', 'croissant', 'bun', 'cinnamon rolls', 'danish pastry', 'custard bun', 'cakes', 'danish',
+                'crispbread', 'rusk', 'grain crackers', 'crackers', 'rice crackers', 'oatmeal', 'muesli', 'breakfast cereal',
+                'cornflakes', 'rolled oats', 'oat pudding', 'almond slices', 'almond flakes', 'chocolate chips', 'chocolate drops'
+            ],
+            'Tørrvarelager & Hermetikk': [
+                'pasta', 'spaghetti', 'macaroni', 'penne', 'fusilli', 'lasagna sheets', 'tortellini', 'ravioli',
+                'rice', 'jasmine rice', 'basmati rice', 'risotto', 'parboiled rice', 'sushi rice',
+                'flour', 'wheat flour', 'whole wheat flour', 'gluten free flour', 'almond flour', 'sifted whole wheat',
+                'sugar', 'powdered sugar', 'icing sugar', 'brown sugar', 'granulated sugar', 'honey', 'syrup', 'agave syrup',
+                'sea salt', 'table salt', 'pepper', 'paprika', 'curry', 'cinnamon', 'nutmeg', 'cloves',
+                'baking powder', 'baking soda', 'vanilla sugar', 'vanilla bean', 'yeast', 'dry yeast', 'cocoa',
+                'canned tomatoes', 'tomato paste', 'ketchup', 'canned corn', 'canned peas',
+                'canned chickpeas', 'canned beans', 'canned tuna', 'canned mackerel', 'canned pineapple',
+                'coconut milk', 'canned coconut milk',
+                'pesto', 'tapenade', 'olive oil', 'canola oil', 'coconut oil', 'butter oil', 'sunflower oil',
+                'vinegar', 'balsamic vinegar', 'red wine vinegar', 'apple cider vinegar', 'soy sauce', 'fish sauce', 'oyster sauce',
+                'bouillon', 'stock', 'chicken stock', 'vegetable stock', 'beef', 'peanut butter', 'hazelnut spread', 'nutella',
+                'jam', 'strawberry jam', 'raspberry jam', 'apricot jam', 'orange marmalade',
+                'granola bars', 'protein bars', 'nuts', 'almonds', 'cashews', 'peanuts', 'hazelnuts',
+                'raisins', 'dried apricots', 'dried cranberries', 'dried fruit'
+            ],
+            'Fryste varer': [
+                'frozen peas', 'frozen vegetables', 'frozen vegetable mix', 'frozen berries', 'frozen strawberries',
+                'frozen blueberries', 'frozen raspberries', 'frozen lingonberries', 'frozen mango', 'frozen berry mix',
+                'pizza', 'grandiosa', 'ready meals', 'lasagna', 'fish gratin', 'hash', 'taco meat',
+                'ice cream', 'ice cream', 'sorbet', 'popsicle', 'ice pop', 'ice cream cones',
+                'french fries', 'potato wedges', 'potato slices', 'croquettes', 'fish fillets', 'fish fingers',
+                'breaded fish', 'frozen pudding'
+            ],
+            'Urter & Krydder': [
+                'salt', 'pepper', 'basil', 'oregano', 'thyme', 'rosemary', 'parsley', 'coriander',
+                'dill', 'chives', 'mint', 'sage', 'tarragon', 'bay leaves', 'curry', 'curry paste',
+                'turmeric', 'cumin', 'coriander seeds', 'chili flakes', 'chipotle', 'cayenne pepper',
+                'paprika powder', 'sweet paprika', 'smoked paprika', 'garlic powder', 'onion powder',
+                'nutmeg', 'cardamom', 'cloves', 'star anise', 'cinnamon', 'vanilla sugar', 'ginger',
+                'sesame seeds', 'poppy seeds', 'sunflower seeds', 'pumpkin seeds', 'chia seeds', 'flax seeds'
+            ],
+            'Drikke': [
+                'water', 'spring water', 'sparkling water', 'mineral water', 'soda', 'cola', 'solo', 'fanta',
+                'sprite', 'pepsi', 'juice concentrate', 'apple juice', 'orange juice', 'juice', 'smoothie',
+                'coffee', 'coffee beans', 'filter coffee', 'espresso', 'tea', 'green tea', 'black tea', 'herbal tea',
+                'cocoa', 'chocolate milk', 'energy drink', 'sports drink', 'protein shake', 'coconut water',
+                'beer', 'pilsner', 'lager', 'non-alcoholic beer', 'non-alcoholic wine', 'light beer'
+            ],
+            'Godteri & Snacks': [
+                'chocolate', 'milk chocolate', 'dark chocolate', 'kvikk lunsj', 'stratos', 'freia milk chocolate',
+                'twist', 'smash', 'non stop', 'center', 'marianne', 'drops', 'mint drops',
+                'candy', 'gummy bears', 'jelly', 'licorice', 'salty licorice', 'sweet licorice', 'lollipop', 'lozenges',
+                'chewing gum', 'popcorn', 'microwave popcorn', 'chips', 'potato chips', 'sørlandschips', 'maarud',
+                'nachos', 'tortilla chips', 'salsa', 'guacamole', 'dip', 'peanuts', 'salted peanuts',
+                'cashews', 'nut mix', 'trail mix', 'trail mix', 'cookies', 'small cookies',
+                'butter cookies', 'digestive', 'ballerina', 'oat cookies'
+            ],
+            'Husholdning & Rengjøring': [
+                'dish soap', 'dishwasher detergent', 'dishwasher tablets', 'dish brush', 'dish cloth',
+                'paper towels', 'cleaning', 'all-purpose cleaner', 'soap', 'soap dispenser', 'toilet paper', 'toilet paper', 'kitchen rolls',
+                'paper towels', 'napkins', 'wet wipes', 'cloths', 'rags', 'sponge', 'scrub sponge',
+                'scouring powder', 'bleach', 'chlorine wipes', 'disinfectant', 'floor cleaner', 'window cleaner', 'glass cleaner',
+                'bathroom cleaner', 'limescale remover', 'universal cleaner', 'oven cleaner', 'stove cleaner',
+                'laundry', 'laundry detergent', 'liquid detergent', 'fabric softener', 'color catcher', 'washing powder',
+                'soap flakes', 'stain remover', 'bleach', 'wool wash',
+                'garbage bags', 'shopping bags', 'freezer bags', 'bread bags', 'aluminum foil', 'plastic wrap', 'baking paper'
+            ],
+            'Vinmonopolet': [
+                'strong beer', 'ipa', 'pale ale', 'stout', 'porter', 'brown ale', 'wheat beer', 'witbier',
+                'wine', 'red wine', 'white wine', 'rosé wine', 'sparkling wine', 'champagne', 'prosecco', 'cava',
+                'cider', 'apple cider', 'pear cider',
+                'spirits', 'vodka', 'whisky', 'gin', 'rum', 'tequila', 'cognac', 'liqueur', 'baileys', 'kahlua',
+                'aperol', 'campari', 'vermouth', 'sherry', 'port wine', 'madeira'
+            ],
+            'Kontorartikler': [
+                'ballpoint pen', 'pencil', 'eraser', 'notepad', 'post-it', 'sticky notes', 'binder', 'sheet protectors',
+                'paper clips', 'binder clips', 'staples', 'stapler', 'hole punch', 'tape', 'tape', 'double sided tape',
+                'calculator', 'scissors', 'office scissors', 'ruler', 'glue', 'glue stick', 'marker', 'marker', 'highlighter',
+                'A4 paper', 'writing paper', 'envelope', 'white envelopes', 'brown envelopes', 'labels',
+                'tags', 'batteries', 'AA batteries', 'AAA batteries', 'USB cable', 'USB drive', 'charging cable'
+            ],
+            'Møbelbutikk': [
+                'light bulb', 'LED bulb', 'energy saving bulb', 'halogen bulb', 'E27 bulb', 'E14 bulb', 'GU10 bulb',
+                'houseplants', 'potted plants', 'flower pot', 'plant pot', 'plant pot', 'cactus',
+                'cushion', 'sofa cushion', 'decorative pillow', 'pillow insert', 'throw blanket', 'wool blanket', 'fleece blanket',
+                'curtain', 'blinds', 'roller blind', 'curtain hooks', 'curtain rings', 'curtain rod',
+                'picture frame', 'photo frame', 'wall decor', 'mirror', 'wall mirror',
+                'candle', 'lit candles', 'scented candle', 'tea lights', 'pillar candle', 'taper candle', 'lighter', 'matches',
+                'basket', 'storage basket', 'woven basket', 'vase', 'glass vase', 'ceramic vase',
+                'mat', 'rug', 'doormat', 'bath mat', 'rug pad'
+            ],
+            'Skredder': [
+                'thread', 'sewing thread', 'cotton thread', 'polyester thread', 'needle', 'sewing needle', 'hand needle', 'machine needle',
+                'button', 'buttons', 'snap button', 'zipper', 'zipper', 'scissors', 'fabric scissors', 'thread scissors',
+                'measuring tape', 'sewing tape', 'darning thread', 'wool thread', 'yarn', 'knitting supplies', 'knitting yarn',
+                'knitting needles', 'circular needles', 'crochet hook', 'safety pin', 'safety pin', 'seam ripper',
+                'fabric', 'cotton fabric', 'jersey', 'fleece', 'felt'
+            ],
+            'Bensinstasjon': [
+                'gasoline', '95 octane', '98 octane', 'diesel', 'biodiesel', 'windshield washer fluid', 'windshield washer fluid',
+                'motor oil', 'car care', 'car shampoo', 'ice scraper', 'ice scraper', 'de-icer spray', 'newspapers',
+                'car air freshener', 'car perfume', 'car scent', 'cleaning cloth', 'car cloth', 'microfiber cloth',
+                'coffee', 'hot dog', 'sausage', 'hot food', 'nachos', 'energy drink', 'red bull', 'battery',
+                'lighters', 'ice cubes', 'energy bar', 'coolant', 'brake fluid', 'jumper cables'
+            ],
+            'Kaffebar/Kafeer': [
+                'espresso', 'double espresso', 'americano', 'latte', 'cappuccino', 'flat white', 'cortado',
+                'macchiato', 'mocha', 'iced coffee', 'iced latte', 'cold brew', 'frappé', 'coffee', 'filter coffee',
+                'tea', 'chai latte', 'matcha latte', 'hot chocolate', 'cocoa', 'iced tea',
+                'croissant', 'butter croissant', 'chocolate croissant', 'almond croissant',
+                'cinnamon roll', 'cinnamon bun', 'sweet roll', 'bun', 'danish pastry', 'cardamom bun',
+                'muffins', 'blueberry muffins', 'chocolate muffins', 'brownie', 'cookies', 'chocolate cookies',
+                'sandwich', 'toast', 'panini', 'wrap', 'salad', 'soup', 'quiche',
+                'smoothie', 'juice', 'freshly squeezed juice', 'yogurt', 'oatmeal', 'granola',
+                'oat milk', 'soy milk', 'almond milk', 'coconut milk', 'milk alternative', 'extra shot', 'syrup'
+            ],
+            'Post': [
+                'stamp', 'stamps', 'A-mail stamp', 'B-mail stamp', 'postage', 'postage rate',
+                'envelope', 'C5 envelope', 'C4 envelope', 'bubble envelope', 'padded envelope',
+                'packing tape', 'brown tape', 'packaging tape', 'wrapping paper', 'bubble wrap',
+                'box', 'cardboard box', 'cardboard box', 'package label', 'address label', 'address tag',
+                'customs form', 'customs declaration', 'CN23', 'sender label', 'return label',
+                'pencil', 'postal scale', 'plastic bag', 'mailing bag', 'mail sack'
+            ],
+            'Diverse': [
+                'wrapping paper', 'gift bag', 'ribbon', 'bow', 'gift tag', 'card', 'birthday card',
+                'congratulations card', 'thank you card', 'invitation', 'envelope', 'balloons', 'napkins',
+                'party napkins', 'paper plates', 'paper plates', 'plastic cups', 'paper cups', 'straws',
+                'party decorations', 'garland', 'banner', 'confetti', 'candles', 'tea lights', 'party candles', 'cake decorations'
             ]
         };
 
@@ -832,6 +1139,7 @@
             document.getElementById('app-title').textContent = t('appTitle');
             document.getElementById('app-subtitle').textContent = t('appSubtitle');
             document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+            document.getElementById('adhd-text').innerHTML = t('adhdExplanation');
 
             const clearBtn = document.querySelector('.button-group button');
             if (clearBtn) clearBtn.textContent = t('clearListBtn');
@@ -1029,8 +1337,9 @@
         function findMatches(query) {
             const normalizedQuery = normalizeText(query).toLowerCase();
             const matches = [];
+            const db = currentLanguage === 'en' ? DATABASE_EN : DATABASE;
 
-            for (const [category, items] of Object.entries(DATABASE)) {
+            for (const [category, items] of Object.entries(db)) {
                 for (const item of items) {
                     if (normalizeText(item).toLowerCase().includes(normalizedQuery)) {
                         matches.push({ item, category });
@@ -1090,9 +1399,10 @@
             const words = normalized.split(' ').filter(w => !FILLER_WORDS.includes(w));
             const cleanedWords = words.filter(w => !ADJECTIVES.includes(w) && !/^\d+$/.test(w) && !/^\d+[a-z]+$/.test(w));
             const searchTerms = cleanedWords.length > 0 ? cleanedWords : words;
+            const db = currentLanguage === 'en' ? DATABASE_EN : DATABASE;
 
             for (const term of searchTerms) {
-                for (const [category, items] of Object.entries(DATABASE)) {
+                for (const [category, items] of Object.entries(db)) {
                     for (const item of items) {
                         const normalizedItem = normalizeText(item);
                         if (normalizedItem === term || normalizedItem.includes(term) || term.includes(normalizedItem)) {
@@ -1113,7 +1423,7 @@
                 const singular = term.endsWith('er') ? term.slice(0, -2) : term;
                 const plural = term + 'er';
 
-                for (const [category, items] of Object.entries(DATABASE)) {
+                for (const [category, items] of Object.entries(db)) {
                     for (const item of items) {
                         const normalizedItem = normalizeText(item);
                         if (normalizedItem === singular || normalizedItem === plural ||
