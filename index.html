@@ -1799,13 +1799,23 @@
 
             const qrcodeDiv = document.getElementById('qrcode');
             qrcodeDiv.innerHTML = '';
-            new QRCode(qrcodeDiv, {
-                text: window.location.origin + window.location.pathname + '?import=' + encoded,
-                width: 200,
-                height: 200,
-                colorDark: '#d97706',
-                colorLight: '#ffffff'
-            });
+
+            if (typeof QRCode !== 'undefined') {
+                try {
+                    new QRCode(qrcodeDiv, {
+                        text: window.location.origin + window.location.pathname + '?import=' + encoded,
+                        width: 200,
+                        height: 200,
+                        colorDark: '#d97706',
+                        colorLight: '#ffffff'
+                    });
+                } catch (e) {
+                    qrcodeDiv.innerHTML = '<p style="color: #86868b; padding: 20px;">QR-kode kunne ikke genereres</p>';
+                    console.error('QR generation failed:', e);
+                }
+            } else {
+                qrcodeDiv.innerHTML = '<p style="color: #86868b; padding: 20px;">QR-kode ikke tilgjengelig</p>';
+            }
 
             document.getElementById('shareModal').classList.add('active');
         }
