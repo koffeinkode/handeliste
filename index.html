@@ -96,12 +96,6 @@
             color: var(--primary);
         }
 
-        .subtitle {
-            font-size: 1em;
-            color: #86868b;
-            font-weight: 400;
-        }
-
         .adhd-explanation {
             background: linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(132, 204, 22, 0.08));
             border: 1px solid rgba(217, 119, 6, 0.2);
@@ -150,10 +144,9 @@
             font-family: inherit;
             resize: none;
             overflow: hidden;
-            min-height: 52px;
+            min-height: auto;
             max-height: 200px;
-            line-height: 1.33;
-            vertical-align: middle;
+            line-height: 1.5;
         }
 
         #searchInput:focus {
@@ -659,7 +652,6 @@
                 <button onclick="setLanguage('en')" id="lang-en">EN</button>
             </div>
             <h1 id="app-title">Handle litt.</h1>
-            <p class="subtitle" id="app-subtitle">Lim inn handleliste eller søk etter enkelvarer</p>
         </header>
 
         <div class="adhd-explanation">
@@ -780,7 +772,7 @@
                 alertSelectCategory: 'Vennligst velg kategori for alle ukjente varer!',
                 alertConfirmClear: 'Er du sikker på at du vil tømme hele listen?',
                 alertListEmpty: 'Listen er allerede tom!',
-                adhdExplanation: 'Surrer du kryss og tvers i butikken? Lim inn listen, så sorterer vi den etter kategorier.',
+                adhdExplanation: 'Surrer du på kryss og tvers i butikken? Lim inn listen, så sorterer vi den etter kategorier.',
                 categories: {
                     'Frukt & Grønt': '🥬 Frukt & Grønt',
                     'Kjøtt & Fisk': '🥩 Kjøtt & Fisk',
@@ -1250,7 +1242,6 @@
 
         function updateUI() {
             document.getElementById('app-title').textContent = t('appTitle');
-            document.getElementById('app-subtitle').textContent = t('appSubtitle');
             document.getElementById('searchInput').placeholder = t('searchPlaceholder');
             document.getElementById('adhd-text').innerHTML = t('adhdExplanation');
 
