@@ -65,31 +65,32 @@
         }
 
         .language-toggle button {
-            padding: 6px 12px;
+            padding: 8px 12px;
             border: none;
             background: transparent;
             border-radius: 4px;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 24px;
             cursor: pointer;
             transition: all 0.15s ease;
-            color: #86868b;
+            opacity: 0.5;
             min-width: auto;
+            line-height: 1;
         }
 
         .language-toggle button.active {
             background: white;
-            color: #1d1d1f;
+            opacity: 1;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .language-toggle button:hover:not(.active) {
-            color: #1d1d1f;
+            opacity: 0.8;
         }
 
         h1 {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 3em;
+            font-size: 4.5em;
+            margin-top: 48px;
             margin-bottom: 8px;
             font-weight: 700;
             letter-spacing: -2.5px;
@@ -648,8 +649,8 @@
     <div class="container">
         <header>
             <div class="language-toggle">
-                <button onclick="setLanguage('no')" class="active" id="lang-no">NO</button>
-                <button onclick="setLanguage('en')" id="lang-en">EN</button>
+                <button onclick="setLanguage('no')" class="active" id="lang-no">🇳🇴</button>
+                <button onclick="setLanguage('en')" id="lang-en">🇬🇧</button>
             </div>
             <h1 id="app-title">Handle litt.</h1>
         </header>
