@@ -647,6 +647,7 @@
             }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -1808,14 +1809,15 @@
             };
 
             const jsonString = JSON.stringify(listData);
-            const encoded = btoa(encodeURIComponent(jsonString));
+            // Bruk LZ-String komprimering for å redusere kodelengden betydelig
+            const compressed = LZString.compressToEncodedURIComponent(jsonString);
 
-            document.getElementById('shareCode').value = encoded;
+            document.getElementById('shareCode').value = compressed;
 
             const qrcodeDiv = document.getElementById('qrcode');
             qrcodeDiv.innerHTML = '';
 
-            const shareUrl = window.location.origin + window.location.pathname + '?import=' + encoded;
+            const shareUrl = window.location.origin + window.location.pathname + '?import=' + compressed;
 
             // Bruk Google Charts API for QR-kode
             const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(shareUrl)}`;
@@ -1863,7 +1865,17 @@
             if (!code) return;
 
             try {
-                const jsonString = decodeURIComponent(atob(code));
+                let jsonString;
+
+                // Prøv først med LZ-String dekomprimering (ny format)
+                try {
+                    jsonString = LZString.decompressFromEncodedURIComponent(code);
+                    if (!jsonString) throw new Error('Dekomprimering feilet');
+                } catch (e) {
+                    // Hvis det feiler, prøv gammel base64-format (bakoverkompatibilitet)
+                    jsonString = decodeURIComponent(atob(code));
+                }
+
                 const listData = JSON.parse(jsonString);
 
                 if (listData.items && Array.isArray(listData.items)) {
@@ -1890,7 +1902,17 @@
 
             if (importCode) {
                 try {
-                    const jsonString = decodeURIComponent(atob(importCode));
+                    let jsonString;
+
+                    // Prøv først med LZ-String dekomprimering (ny format)
+                    try {
+                        jsonString = LZString.decompressFromEncodedURIComponent(importCode);
+                        if (!jsonString) throw new Error('Dekomprimering feilet');
+                    } catch (e) {
+                        // Hvis det feiler, prøv gammel base64-format (bakoverkompatibilitet)
+                        jsonString = decodeURIComponent(atob(importCode));
+                    }
+
                     const listData = JSON.parse(jsonString);
 
                     if (listData.items && Array.isArray(listData.items)) {
