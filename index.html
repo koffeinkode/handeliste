@@ -1785,13 +1785,10 @@
                 return;
             }
 
-            const listData = {
-                items: shoppingList,
-                customItems: customItems,
-                learnedVariants: learnedVariants
-            };
+            // Bare del navn og kategori (ikke id, checked, note) for kortere kode
+            const minimalItems = shoppingList.map(item => [item.name, item.category]);
 
-            const jsonString = JSON.stringify(listData);
+            const jsonString = JSON.stringify(minimalItems);
             // Bruk LZ-String komprimering for å redusere kodelengden betydelig
             const compressed = LZString.compressToEncodedURIComponent(jsonString);
 
@@ -1860,7 +1857,23 @@
 
                 const listData = JSON.parse(jsonString);
 
-                if (listData.items && Array.isArray(listData.items)) {
+                // Håndter nytt format (array av [name, category])
+                if (Array.isArray(listData) && listData.length > 0 && Array.isArray(listData[0])) {
+                    shoppingList = listData.map(([name, category]) => ({
+                        id: Date.now() + Math.random(),
+                        name,
+                        category,
+                        checked: false,
+                        note: ''
+                    }));
+
+                    saveToStorage();
+                    renderList();
+                    closeImportModal();
+                    alert(t('importSuccess'));
+                }
+                // Håndter gammelt format (objekt med items, customItems, learnedVariants)
+                else if (listData.items && Array.isArray(listData.items)) {
                     shoppingList = listData.items;
                     customItems = listData.customItems || {};
                     learnedVariants = listData.learnedVariants || {};
@@ -1868,7 +1881,6 @@
                     saveToStorage();
                     renderList();
                     closeImportModal();
-
                     alert(t('importSuccess'));
                 } else {
                     throw new Error('Invalid format');
