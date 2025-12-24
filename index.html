@@ -698,7 +698,8 @@
         </div>
 
         <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #86868b; font-size: 14px;">
-            Et lite prosjekt av Hallvar Bugge Johnsen - <a href="mailto:hei@hallvar.no" style="color: var(--primary); text-decoration: none;">hei@hallvar.no</a>
+            <p id="footer-credit" style="margin: 0 0 8px 0;">Et lite prosjekt av Hallvar Bugge Johnsen - <a href="mailto:hei@hallvar.no" style="color: var(--primary); text-decoration: none;">hei@hallvar.no</a></p>
+            <p id="privacy-notice" style="margin: 0; font-size: 13px; opacity: 0.8;">🔒 All data lagres kun lokalt i nettleserens cache. Ingenting forlater enheten din.</p>
         </footer>
     </div>
 
@@ -801,7 +802,9 @@
                     'Kaffebar/Kafeer': '☕ Kaffebar/Kafeer',
                     'Post': '📮 Post',
                     'Diverse': '📦 Diverse'
-                }
+                },
+                footerCredit: 'Et lite prosjekt av Hallvar Bugge Johnsen',
+                privacyNotice: '🔒 All data lagres kun lokalt i nettleserens cache. Ingenting forlater enheten din.'
             },
             en: {
                 appTitle: '🛒 Shopping List 1.0',
@@ -850,7 +853,9 @@
                     'Kaffebar/Kafeer': '☕ Coffee Shop',
                     'Post': '📮 Post Office',
                     'Diverse': '📦 Miscellaneous'
-                }
+                },
+                footerCredit: 'A small project by Hallvar Bugge Johnsen',
+                privacyNotice: '🔒 All data is stored locally in your browser cache only. Nothing leaves your device.'
             }
         };
 
@@ -1267,6 +1272,17 @@
             document.getElementById('importModalTitle').textContent = t('importModalTitle');
             document.getElementById('importCodeLabel').textContent = t('importCodeLabel');
             document.getElementById('importCode').placeholder = t('importCodePlaceholder');
+
+            // Update footer
+            const footerCredit = document.getElementById('footer-credit');
+            if (footerCredit) {
+                footerCredit.innerHTML = t('footerCredit') + ' - <a href="mailto:hei@hallvar.no" style="color: var(--primary); text-decoration: none;">hei@hallvar.no</a>';
+            }
+
+            const privacyNotice = document.getElementById('privacy-notice');
+            if (privacyNotice) {
+                privacyNotice.textContent = t('privacyNotice');
+            }
         }
 
         function setupSearchListeners() {
