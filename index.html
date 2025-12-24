@@ -644,6 +644,12 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
 </head>
 <body>
     <div class="container">
@@ -743,6 +749,32 @@
     </div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCUqnhuWdzRJBloEwZk05zWGwd5LOcrTf0",
+            authDomain: "handlelitt.firebaseapp.com",
+            projectId: "handlelitt",
+            storageBucket: "handlelitt.firebasestorage.app",
+            messagingSenderId: "592202081634",
+            appId: "1:592202081634:web:7fa02585685b9a2719b83b"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const functions = firebase.functions();
+
+        // Enable offline persistence
+        db.enablePersistence({ synchronizeTabs: true })
+            .catch(err => {
+                if (err.code === 'failed-precondition') {
+                    console.warn('Persistence failed: Multiple tabs open');
+                } else if (err.code === 'unimplemented') {
+                    console.warn('Persistence not supported by browser');
+                }
+            });
+
         let currentLanguage = localStorage.getItem('language') || 'no';
 
         const TRANSLATIONS = {
@@ -1209,8 +1241,22 @@
             'god', 'gode', 'beste', 'billig', 'billige', 'dyr', 'dyre', 'ny', 'nye', 'gammel', 'gamle'
         ];
 
-        function initializeApp() {
-            loadFromStorage();
+        async function initializeApp() {
+            // Authenticate user (anonymous or existing)
+            await ensureAuthenticated();
+
+            const userId = auth.currentUser.uid;
+
+            // Migrate localStorage to Firestore if needed
+            if (!localStorage.getItem('migratedToFirestore')) {
+                await migrateLocalStorageToFirestore(userId);
+            }
+
+            // Load global items cache
+            await loadGlobalItemsCache();
+
+            // Setup real-time listeners
+            setupRealtimeListeners(userId);
 
             // Set initial language button state
             document.getElementById('lang-no').classList.toggle('active', currentLanguage === 'no');
@@ -1219,6 +1265,64 @@
             updateUI();
             renderList();
             setupSearchListeners();
+        }
+
+        async function ensureAuthenticated() {
+            return new Promise((resolve, reject) => {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        console.log('User authenticated:', user.uid, 'Anonymous:', user.isAnonymous);
+                        if (user.isAnonymous) {
+                            showAnonymousWarning();
+                        }
+                        resolve(user);
+                    } else {
+                        console.log('No user, signing in anonymously...');
+                        auth.signInAnonymously()
+                            .then(resolve)
+                            .catch(reject);
+                    }
+                });
+            });
+        }
+
+        function showAnonymousWarning() {
+            // Check if banner already exists
+            if (document.querySelector('.anonymous-warning')) return;
+
+            const banner = document.createElement('div');
+            banner.className = 'anonymous-warning';
+            banner.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, rgba(217, 119, 6, 0.95), rgba(234, 88, 12, 0.95));
+                color: white;
+                padding: 12px 20px;
+                text-align: center;
+                z-index: 10000;
+                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            `;
+            banner.innerHTML = `
+                ⚠️ Du bruker anonym modus. Data kan slettes ved cache-nullstilling.
+                <button onclick="showLoginModal()" style="
+                    background: white;
+                    color: var(--primary);
+                    border: none;
+                    padding: 6px 16px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin-left: 12px;
+                    font-size: 13px;
+                ">Logg inn</button>
+            `;
+            document.body.prepend(banner);
+
+            // Adjust body padding to account for banner
+            document.body.style.paddingTop = '60px';
         }
 
         function setLanguage(lang) {
@@ -1960,6 +2064,243 @@
             renderList();
             closeNoteModal();
         }
+
+        // ========== FIREBASE HELPER FUNCTIONS ==========
+
+        let globalItemsCache = null;
+        let globalCategoriesCache = null;
+
+        async function loadGlobalItemsCache() {
+            // Check if cache is fresh (< 24h old)
+            const cacheTime = localStorage.getItem('globalItemsCacheTime');
+            const now = Date.now();
+
+            if (cacheTime && (now - parseInt(cacheTime) < 24 * 60 * 60 * 1000)) {
+                globalItemsCache = JSON.parse(localStorage.getItem('globalItemsCache') || '{}');
+                globalCategoriesCache = JSON.parse(localStorage.getItem('globalCategoriesCache') || '[]');
+                console.log('Loaded global items from cache');
+                return;
+            }
+
+            console.log('Fetching fresh global items from Firestore...');
+
+            try {
+                // Fetch global items
+                const itemsSnapshot = await db.collection('globalItems')
+                    .where('approved', '==', true)
+                    .get();
+
+                globalItemsCache = {};
+                itemsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const lang = currentLanguage === 'en' ? 'name_en' : 'name_no';
+                    if (!globalItemsCache[data.category]) {
+                        globalItemsCache[data.category] = [];
+                    }
+                    if (data[lang]) {
+                        globalItemsCache[data.category].push(data[lang]);
+                    }
+                });
+
+                // Fetch global categories
+                const categoriesSnapshot = await db.collection('globalCategories')
+                    .where('approved', '==', true)
+                    .orderBy('order')
+                    .get();
+
+                globalCategoriesCache = categoriesSnapshot.docs.map(doc => doc.data());
+
+                // Cache to localStorage
+                localStorage.setItem('globalItemsCache', JSON.stringify(globalItemsCache));
+                localStorage.setItem('globalCategoriesCache', JSON.stringify(globalCategoriesCache));
+                localStorage.setItem('globalItemsCacheTime', now.toString());
+
+                console.log('Global items cached successfully');
+            } catch (error) {
+                console.error('Error loading global items:', error);
+                // Fallback to hardcoded DATABASE if Firestore fails
+                globalItemsCache = DATABASE;
+                globalCategoriesCache = CATEGORIES.map((cat, index) => ({
+                    name_no: cat,
+                    order: index
+                }));
+            }
+
+            // If Firestore is empty, use hardcoded DATABASE as fallback
+            if (!globalItemsCache || Object.keys(globalItemsCache).length === 0) {
+                console.warn('Firestore is empty, using hardcoded DATABASE');
+                globalItemsCache = DATABASE;
+                globalCategoriesCache = CATEGORIES.map((cat, index) => ({
+                    name_no: cat,
+                    order: index
+                }));
+            }
+        }
+
+        function setupRealtimeListeners(userId) {
+            // Listen to default shopping list
+            db.collection('users').doc(userId).collection('lists').doc('default')
+                .onSnapshot(snapshot => {
+                    if (snapshot.exists) {
+                        console.log('List updated from Firestore');
+                        shoppingList = snapshot.data().items || [];
+                        renderList();
+                    }
+                }, error => {
+                    console.error('Error listening to list:', error);
+                });
+
+            // Listen to custom items
+            db.collection('users').doc(userId).collection('customItems')
+                .onSnapshot(snapshot => {
+                    customItems = {};
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const lang = currentLanguage === 'en' ? 'name_en' : 'name_no';
+                        if (data[lang]) {
+                            customItems[data[lang]] = data.category;
+                        }
+                    });
+                    console.log('Custom items updated:', Object.keys(customItems).length);
+                }, error => {
+                    console.error('Error listening to custom items:', error);
+                });
+        }
+
+        async function migrateLocalStorageToFirestore(userId) {
+            console.log('Starting localStorage to Firestore migration...');
+
+            const batch = db.batch();
+
+            // Migrate shoppingList to default list
+            const savedList = localStorage.getItem('shoppingList');
+            const shoppingListData = savedList ? JSON.parse(savedList) : [];
+
+            if (shoppingListData.length > 0) {
+                const listRef = db.collection('users').doc(userId).collection('lists').doc('default');
+                batch.set(listRef, {
+                    name: 'Min Liste',
+                    items: shoppingListData,
+                    sharedWith: [],
+                    shareCode: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log(`Migrating ${shoppingListData.length} items to Firestore`);
+            }
+
+            // Migrate customItems
+            const savedCustom = localStorage.getItem('customItems');
+            const customItemsData = savedCustom ? JSON.parse(savedCustom) : {};
+
+            Object.entries(customItemsData).forEach(([itemName, category]) => {
+                const itemRef = db.collection('users').doc(userId).collection('customItems').doc();
+                batch.set(itemRef, {
+                    name_no: itemName,
+                    name_en: null, // Will trigger Cloud Function for translation
+                    category,
+                    pendingApproval: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+
+            if (Object.keys(customItemsData).length > 0) {
+                console.log(`Migrating ${Object.keys(customItemsData).length} custom items`);
+            }
+
+            // Migrate language preference
+            const language = localStorage.getItem('language') || 'no';
+            const userRef = db.collection('users').doc(userId);
+            batch.set(userRef, {
+                isAnonymous: auth.currentUser.isAnonymous,
+                email: auth.currentUser.email || null,
+                preferences: { language },
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            try {
+                await batch.commit();
+                localStorage.setItem('migratedToFirestore', 'true');
+                localStorage.setItem('migrationDate', new Date().toISOString());
+                console.log('Migration completed successfully');
+            } catch (error) {
+                console.error('Migration failed:', error);
+                alert('Kunne ikke migrere data til skyen. Prøver igjen ved neste lasting.');
+            }
+        }
+
+        function showLoginModal() {
+            alert('Påloggingsfunksjonalitet kommer snart! For nå bruker du anonym modus.');
+            // TODO: Implement login modal in next step
+        }
+
+        // ========== SEED FUNCTIONS (Run once to populate Firestore) ==========
+
+        async function seedGlobalItems() {
+            console.log('Starting to seed Firestore with global items and categories...');
+
+            const batch = db.batch();
+            let itemCount = 0;
+            let categoryCount = 0;
+
+            // Seed globalCategories
+            CATEGORIES.forEach((cat, index) => {
+                const catRef = db.collection('globalCategories').doc();
+                const emoji = TRANSLATIONS.no.categories[cat] ? TRANSLATIONS.no.categories[cat].split(' ')[0] : '📦';
+                const name_en = TRANSLATIONS.en.categories[cat] ? TRANSLATIONS.en.categories[cat].replace(emoji + ' ', '') : cat;
+
+                batch.set(catRef, {
+                    name_no: cat,
+                    name_en: name_en,
+                    emoji: emoji,
+                    order: index,
+                    approved: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                categoryCount++;
+            });
+
+            // Seed globalItems from DATABASE (Norwegian)
+            Object.entries(DATABASE).forEach(([category, items]) => {
+                items.forEach(itemName => {
+                    // Find English translation from DATABASE_EN
+                    let enName = itemName; // Default to Norwegian if not found
+
+                    if (DATABASE_EN[category]) {
+                        const indexInNo = DATABASE[category].indexOf(itemName);
+                        if (indexInNo !== -1 && DATABASE_EN[category][indexInNo]) {
+                            enName = DATABASE_EN[category][indexInNo];
+                        }
+                    }
+
+                    const itemRef = db.collection('globalItems').doc();
+                    batch.set(itemRef, {
+                        name_no: itemName,
+                        name_en: enName,
+                        category: category,
+                        approved: true,
+                        usageCount: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    itemCount++;
+                });
+            });
+
+            try {
+                await batch.commit();
+                console.log(`✅ Seeding complete! Added ${categoryCount} categories and ${itemCount} items to Firestore.`);
+                alert(`Database populert! ${categoryCount} kategorier og ${itemCount} varer lagt til. Last siden på nytt.`);
+            } catch (error) {
+                console.error('❌ Seeding failed:', error);
+                alert('Kunne ikke populere database: ' + error.message);
+            }
+        }
+
+        // Make seedGlobalItems available globally for console access
+        window.seedGlobalItems = seedGlobalItems;
+
+        // ========== END FIREBASE HELPER FUNCTIONS ==========
 
         initializeApp();
         checkUrlImport();
