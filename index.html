@@ -152,7 +152,8 @@
             overflow: hidden;
             min-height: 52px;
             max-height: 200px;
-            line-height: 1.5;
+            line-height: 1.33;
+            vertical-align: middle;
         }
 
         #searchInput:focus {
@@ -648,6 +649,7 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -656,7 +658,7 @@
                 <button onclick="setLanguage('no')" class="active" id="lang-no">NO</button>
                 <button onclick="setLanguage('en')" id="lang-en">EN</button>
             </div>
-            <h1 id="app-title">🛒 Handle litt.</h1>
+            <h1 id="app-title">Handle litt.</h1>
             <p class="subtitle" id="app-subtitle">Lim inn handleliste eller søk etter enkelvarer</p>
         </header>
 
@@ -752,7 +754,7 @@
 
         const TRANSLATIONS = {
             no: {
-                appTitle: '🛒 Handle litt.',
+                appTitle: 'Handle litt.',
                 appSubtitle: 'Lim inn handleliste eller søk etter enkelvarer',
                 searchPlaceholder: 'Lim inn handleliste eller søk etter vare...',
                 clearListBtn: '🗑️ Tøm liste',
@@ -778,7 +780,7 @@
                 alertSelectCategory: 'Vennligst velg kategori for alle ukjente varer!',
                 alertConfirmClear: 'Er du sikker på at du vil tømme hele listen?',
                 alertListEmpty: 'Listen er allerede tom!',
-                adhdExplanation: '<strong>En ADHD-vennlig handleliste</strong> - Lim inn en formatert handleliste/melding du har fått fra noen andre, og Handle litt. vil sortere ut varer basert på kategorier automatisk for enklere handleturer',
+                adhdExplanation: 'Surrer du kryss og tvers i butikken? Lim inn listen, så sorterer vi den etter kategorier.',
                 categories: {
                     'Frukt & Grønt': '🥬 Frukt & Grønt',
                     'Kjøtt & Fisk': '🥩 Kjøtt & Fisk',
@@ -803,7 +805,7 @@
                 privacyNotice: '🔒 All data lagres kun lokalt i nettleserens cache. Ingenting forlater enheten din.'
             },
             en: {
-                appTitle: '🛒 Handle litt.',
+                appTitle: 'Handle litt.',
                 appSubtitle: 'Paste your list or search for items',
                 searchPlaceholder: 'Paste shopping list or search for items...',
                 clearListBtn: '🗑️ Clear list',
@@ -829,7 +831,7 @@
                 alertSelectCategory: 'Please select category for all unknown items!',
                 alertConfirmClear: 'Are you sure you want to clear the entire list?',
                 alertListEmpty: 'The list is already empty!',
-                adhdExplanation: '<strong>An ADHD-friendly shopping list</strong> - Paste a formatted shopping list or message from someone else, and Handle litt. will automatically sort items by category for easier shopping trips',
+                adhdExplanation: 'Shopping in circles? Paste your list, and we'll sort it by categories.',
                 categories: {
                     'Frukt & Grønt': '🥬 Fruits & Vegetables',
                     'Kjøtt & Fisk': '🥩 Meat & Fish',
@@ -1808,20 +1810,19 @@
 
             const shareUrl = window.location.origin + window.location.pathname + '?import=' + compressed;
 
-            // Bruk Google Charts API for QR-kode
-            const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(shareUrl)}`;
-
-            const img = document.createElement('img');
-            img.src = qrUrl;
-            img.alt = 'QR-kode';
-            img.style.width = '200px';
-            img.style.height = '200px';
-
-            img.onerror = () => {
+            // Generer QR-kode lokalt med QRCode.js
+            try {
+                new QRCode(qrcodeDiv, {
+                    text: shareUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            } catch (e) {
                 qrcodeDiv.innerHTML = '<p style="color: #86868b; padding: 20px;">QR-kode kunne ikke genereres</p>';
-            };
-
-            qrcodeDiv.appendChild(img);
+            }
 
             document.getElementById('shareModal').classList.add('active');
         }
