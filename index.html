@@ -141,7 +141,7 @@
 
         #searchInput {
             width: 100%;
-            padding: 12px 16px;
+            padding: 16px 18px;
             border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             font-size: 15px;
@@ -150,7 +150,7 @@
             font-family: inherit;
             resize: none;
             overflow: hidden;
-            min-height: 44px;
+            min-height: 52px;
             max-height: 200px;
             line-height: 1.5;
         }
@@ -691,11 +691,6 @@
         </div>
 
         <div class="shopping-list" id="shoppingList">
-            <div class="empty-state">
-                <div class="empty-state-icon">📝</div>
-                <p>Ingen varer lagt til ennå.</p>
-                <p style="margin-top: 10px; font-size: 0.9em;">Lim inn en liste eller søk etter enkelvarer i feltet over</p>
-            </div>
         </div>
 
         <footer style="text-align: center; margin-top: 40px; padding: 20px; color: #86868b; font-size: 14px;">
@@ -1690,13 +1685,7 @@
             const container = document.getElementById('shoppingList');
 
             if (shoppingList.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📝</div>
-                        <p>${t('noItemsYet')}</p>
-                        <p style="margin-top: 10px; font-size: 0.9em;">${t('noItemsDesc')}</p>
-                    </div>
-                `;
+                container.innerHTML = '';
                 return;
             }
 
