@@ -2992,6 +2992,14 @@
                 // Sync to Firestore if shared
                 const listId = localStorage.getItem('activeListId');
                 if (listId) {
+                    // Check if user can edit
+                    if (!(await canEditSharedList(listId))) {
+                        // Rollback
+                        shoppingList = shoppingList.filter(i => i.id !== newItemId);
+                        renderList();
+                        return;
+                    }
+
                     try {
                         await db.collection('sharedLists').doc(listId).update({
                             items: shoppingList,
@@ -3016,6 +3024,8 @@
         async function toggleItem(id) {
             const item = shoppingList.find(item => item.id === id);
             if (item) {
+                const oldChecked = item.checked;
+
                 // Optimistic update
                 item.checked = !item.checked;
                 saveToStorage();
@@ -3024,6 +3034,14 @@
                 // Sync to Firestore if shared
                 const listId = localStorage.getItem('activeListId');
                 if (listId) {
+                    // Check if user can edit
+                    if (!(await canEditSharedList(listId))) {
+                        // Rollback
+                        item.checked = oldChecked;
+                        renderList();
+                        return;
+                    }
+
                     try {
                         await db.collection('sharedLists').doc(listId).update({
                             items: shoppingList,
@@ -3037,6 +3055,8 @@
         }
 
         async function deleteItem(id) {
+            const itemToDelete = shoppingList.find(item => item.id === id);
+
             // Optimistic update
             shoppingList = shoppingList.filter(item => item.id !== id);
             saveToStorage();
@@ -3045,6 +3065,16 @@
             // Sync to Firestore if shared
             const listId = localStorage.getItem('activeListId');
             if (listId) {
+                // Check if user can edit
+                if (!(await canEditSharedList(listId))) {
+                    // Rollback
+                    if (itemToDelete) {
+                        shoppingList.push(itemToDelete);
+                    }
+                    renderList();
+                    return;
+                }
+
                 try {
                     await db.collection('sharedLists').doc(listId).update({
                         items: shoppingList,
@@ -3077,12 +3107,22 @@
                 : t('alertConfirmClear');
 
             if (confirm(confirmMsg)) {
+                const oldList = [...shoppingList];
+
                 // Optimistic update
                 shoppingList = [];
                 saveToStorage();
 
                 // If shared, update Firestore and disconnect
                 if (listId) {
+                    // Check if user can edit
+                    if (!(await canEditSharedList(listId))) {
+                        // Rollback
+                        shoppingList = oldList;
+                        renderList();
+                        return;
+                    }
+
                     try {
                         await db.collection('sharedLists').doc(listId).update({
                             items: [],
@@ -3234,6 +3274,43 @@
             return localStorage.getItem('userNickname') || 'Meg';
         }
 
+        async function canEditSharedList(listId) {
+            const userNickname = localStorage.getItem('userNickname');
+            const userId = auth.currentUser?.uid;
+
+            if (!listId || !userId) return false;
+
+            try {
+                const doc = await db.collection('sharedLists').doc(listId).get();
+                if (!doc.exists) return false;
+
+                const data = doc.data();
+                const participants = data.participants || [];
+                const isActive = data.isActive !== false;
+
+                // Listesjef can always edit
+                if (userNickname === 'Listesjef') return true;
+
+                // Check if user is in participants list
+                const isInParticipants = participants.some(p => p.userId === userId);
+                if (!isInParticipants) {
+                    alert('Du er fjernet fra listen og kan ikke lenger redigere den');
+                    return false;
+                }
+
+                // Check if list is active
+                if (!isActive) {
+                    alert('Listen er deaktivert av Listesjef og kan ikke redigeres');
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error checking edit permissions:', error);
+                return false;
+            }
+        }
+
         function setupSharedListListener(listId) {
             if (sharedListUnsubscribe) {
                 sharedListUnsubscribe();
@@ -3242,18 +3319,54 @@
             sharedListUnsubscribe = db.collection('sharedLists')
                 .doc(listId)
                 .onSnapshot(snapshot => {
-                    if (!snapshot.exists) return;
+                    if (!snapshot.exists) {
+                        console.log('⚠️ Shared list deleted, logging out...');
+                        alert('Listen er slettet av Listesjef');
+                        localStorage.removeItem('activeListId');
+                        localStorage.removeItem('userNickname');
+                        shoppingList = [];
+                        localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+                        updateUI();
+                        renderList();
+                        return;
+                    }
 
                     const data = snapshot.data();
-                    console.log('Shared list update - Items count:', data.items?.length || 0);
+                    const participants = data.participants || [];
+                    const isActive = data.isActive !== false;
+                    const userId = auth.currentUser?.uid;
+                    const userNickname = localStorage.getItem('userNickname');
+
+                    // Check if current user is still in participants list
+                    const isInParticipants = participants.some(p => p.userId === userId);
+
+                    if (!isInParticipants) {
+                        console.log('⚠️ You have been removed from the list');
+                        alert('Du er fjernet fra den delte listen av Listesjef');
+                        localStorage.removeItem('activeListId');
+                        localStorage.removeItem('userNickname');
+                        shoppingList = [];
+                        localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+                        updateUI();
+                        renderList();
+                        return;
+                    }
+
+                    // Check if list is deactivated (only for non-Listesjef users)
+                    if (!isActive && userNickname !== 'Listesjef') {
+                        console.log('⚠️ List has been deactivated by Listesjef');
+                        // Don't log them out, but they can't edit anymore (UI will handle this)
+                    }
+
+                    console.log('Shared list update - Items count:', data.items?.length || 0, 'isActive:', isActive);
                     shoppingList = data.items || [];
                     renderList();
                     saveToStorage();
 
                     // Update participants badge and tooltip
-                    if (data.participants && data.participants.length > 0) {
+                    if (participants.length > 0) {
                         const myNickname = getCurrentNickname();
-                        const count = data.participants.length;
+                        const count = participants.length;
 
                         // Update badge text
                         const badgeText = document.getElementById('badgeText');
@@ -3265,7 +3378,7 @@
 
                         // Update tooltip content
                         const participantsList = document.getElementById('participantsList');
-                        participantsList.innerHTML = data.participants.map(p => {
+                        participantsList.innerHTML = participants.map(p => {
                             const isSelf = p.nickname === myNickname;
                             return `<div style="display: flex; align-items: center; gap: 6px;">
                                 <span style="color: #34c759; font-size: 10px;">●</span>
@@ -3273,6 +3386,9 @@
                             </div>`;
                         }).join('');
                     }
+
+                    // Update UI to reflect active/inactive state
+                    updateUI();
                 }, error => {
                     console.error('Error listening to shared list:', error);
                 });
@@ -3877,6 +3993,7 @@
             const item = shoppingList.find(item => item.id === currentEditingItemId);
             if (!item) return;
 
+            const oldNote = item.note;
             item.note = document.getElementById('noteInput').value.trim();
 
             saveToStorage();
@@ -3886,6 +4003,14 @@
             // Sync to Firestore if shared
             const listId = localStorage.getItem('activeListId');
             if (listId) {
+                // Check if user can edit
+                if (!(await canEditSharedList(listId))) {
+                    // Rollback
+                    item.note = oldNote;
+                    renderList();
+                    return;
+                }
+
                 try {
                     await db.collection('sharedLists').doc(listId).update({
                         items: shoppingList,
