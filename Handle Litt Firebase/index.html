@@ -2470,8 +2470,9 @@
                         currentParsedItems.push({ text: item, category: match.category });
                         learnedVariants[normalized] = { original: match.item, category: match.category };
                     } else {
-                        unrecognized.push(item);
-                        currentParsedItems.push({ text: item, category: null });
+                        // No match - add to "Diverse"
+                        recognized.push({ text: item, category: 'Diverse' });
+                        currentParsedItems.push({ text: item, category: 'Diverse' });
                     }
                 }
             });
@@ -2740,9 +2741,8 @@
                     submitItemForApproval(userInput, match.category);
                 }
             } else {
-                // No match at all - add to "Ukategorisert" and send for approval
-                addItemToList(userInput, 'Ukategorisert');
-                submitItemForApproval(userInput, 'Ukategorisert');
+                // No match at all - add to "Diverse"
+                addItemToList(userInput, 'Diverse');
             }
         }
 
