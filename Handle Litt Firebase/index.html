@@ -1798,8 +1798,11 @@
                 setupSharedListListener(activeListId);
             }
 
-            document.getElementById('lang-no').classList.toggle('active', currentLanguage === 'no');
-            document.getElementById('lang-en').classList.toggle('active', currentLanguage === 'en');
+            // Update language buttons if they exist
+            const langNoBtn = document.getElementById('lang-no');
+            const langEnBtn = document.getElementById('lang-en');
+            if (langNoBtn) langNoBtn.classList.toggle('active', currentLanguage === 'no');
+            if (langEnBtn) langEnBtn.classList.toggle('active', currentLanguage === 'en');
 
             // Initialize view mode
             updateUI();
