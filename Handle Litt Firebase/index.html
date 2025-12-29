@@ -1,0 +1,3774 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handle Litt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+        :root {
+            --primary: #d97706;
+            --primary-hover: #c2410c;
+            --primary-light: rgba(217, 119, 6, 0.1);
+
+            --secondary: #84cc16;
+            --success: #65a30d;
+            --danger: #dc2626;
+
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(217, 119, 6, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(132, 204, 22, 0.10) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(251, 191, 36, 0.08) 0%, transparent 60%),
+                linear-gradient(135deg, #fefcf5 0%, #f5f3e8 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px 20px 180px 20px;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #1d1d1f;
+            margin-bottom: 24px;
+            padding: 12px 0;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .language-toggle button {
+            padding: 6px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            opacity: 0.6;
+            min-width: auto;
+            line-height: 1.2;
+            color: #1d1d1f;
+        }
+
+        .language-toggle button.active {
+            background: white;
+            opacity: 1;
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-toggle button:hover:not(.active) {
+            opacity: 0.9;
+            background: white;
+        }
+
+        .burger-menu-btn {
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            opacity: 0.7;
+            min-width: auto;
+            line-height: 1;
+        }
+
+        .burger-menu-btn:hover {
+            opacity: 1;
+            background: white;
+        }
+
+        .burger-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 160px;
+            overflow: hidden;
+        }
+
+        .burger-menu-item {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: #1d1d1f;
+        }
+
+        .burger-menu-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .burger-menu-item:active {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.2em;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+        }
+
+        /* Modern shared badge */
+        .shared-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(52, 199, 89, 0.12);
+            border: 1px solid rgba(52, 199, 89, 0.3);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #34c759;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .shared-badge:hover {
+            background: rgba(52, 199, 89, 0.18);
+            border-color: rgba(52, 199, 89, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .badge-dot {
+            font-size: 8px;
+            line-height: 1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Tooltip for participants */
+        .participants-tooltip {
+            position: absolute;
+            top: 60px;
+            left: 140px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            font-size: 13px;
+            color: #1d1d1f;
+            z-index: 1000;
+            animation: tooltipFadeIn 0.2s ease;
+            min-width: 160px;
+        }
+
+        @keyframes tooltipFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        #searchInput.loading::placeholder {
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        .participants-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 20px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-left: 1px solid rgba(0, 0, 0, 0.08);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            transform: rotate(45deg);
+        }
+
+        #participantsList {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .adhd-explanation {
+            margin: 0 auto 24px auto;
+            text-align: center;
+            font-size: 14px;
+            color: #1d1d1f;
+        }
+
+        .adhd-explanation strong {
+            color: #1d1d1f;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow:
+                0 8px 32px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 100;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-container::after {
+            content: '↵';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #86868b;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 16px;
+            padding-right: 48px; /* Rom for enter-symbol */
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
+            font-family: inherit;
+            resize: none;
+            overflow: hidden;
+            min-height: 56px;
+            max-height: 200px;
+            line-height: 1.5;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        #searchInput::placeholder {
+            color: #86868b;
+            opacity: 1;
+        }
+
+        #autocomplete {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px 12px 0 0;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .autocomplete-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s ease;
+            min-height: 48px;
+            font-size: 16px;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--primary-light);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-category {
+            font-size: 0.85em;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .button-group .btn-secondary {
+            padding: 8px 12px;
+            font-size: 13px;
+            flex: 1;
+            min-width: auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex: 1;
+            min-width: 150px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--primary-hover);
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1d1d1f;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-secondary:active {
+            background: rgba(0, 0, 0, 0.12);
+            transform: scale(0.98);
+        }
+
+        /* Sticky Footer */
+        .sticky-footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 600px;
+            width: calc(100% - 40px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sticky-footer .search-container {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: space-evenly;
+        }
+
+        .icon-btn {
+            flex: 1;
+            min-height: 52px;
+            font-size: 24px;
+            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--primary);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .shopping-list {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow:
+                0 8px 32px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-list-placeholder {
+            text-align: center;
+            padding: 48px 24px;
+            color: #86868b;
+            font-size: 15px;
+            opacity: 0.7;
+        }
+
+        .category {
+            margin-bottom: 24px;
+        }
+
+        .category:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-count {
+            font-size: 0.75em;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 10px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            min-height: 50px;
+        }
+
+        .item:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .item.checked {
+            opacity: 0.4;
+        }
+
+        .item.checked .item-name {
+            text-decoration: line-through;
+        }
+
+        .item.highlight {
+            background: rgba(52, 199, 89, 0.15);
+            border-color: rgba(52, 199, 89, 0.3);
+            animation: fadeHighlight 3s ease-out forwards;
+        }
+
+        @keyframes fadeHighlight {
+            0% {
+                background: rgba(52, 199, 89, 0.25);
+                border-color: rgba(52, 199, 89, 0.4);
+            }
+            100% {
+                background: rgba(0, 0, 0, 0.02);
+                border-color: rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+        }
+
+        .item-name {
+            flex: 1;
+            font-size: 16px;
+            color: #1d1d1f;
+        }
+
+        .item-note {
+            font-size: 13px;
+            color: #86868b;
+            font-style: italic;
+            margin-top: 3px;
+        }
+
+        .edit-note-btn {
+            background: transparent;
+            color: #86868b;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.15s ease;
+            min-width: auto;
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .edit-note-btn:hover {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--primary);
+            opacity: 1;
+        }
+
+        .edit-note-btn:active {
+            transform: scale(0.95);
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: #86868b;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 400;
+            transition: all 0.15s ease;
+            min-width: auto;
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+            opacity: 1;
+        }
+
+        .delete-btn:active {
+            transform: scale(0.95);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #86868b;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1d1d1f;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1.3em;
+            cursor: pointer;
+            color: #86868b;
+            min-width: auto;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #1d1d1f;
+        }
+
+        #bulkTextarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', monospace;
+            resize: vertical;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        #bulkTextarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .preview-section {
+            margin-bottom: 20px;
+        }
+
+        .preview-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1d1d1f;
+            font-size: 0.95em;
+        }
+
+        .preview-items {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .preview-item {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-item-text {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .preview-item-category {
+            font-size: 0.85em;
+            color: #86868b;
+            margin-left: 10px;
+        }
+
+        .unrecognized-items {
+            margin-top: 15px;
+        }
+
+        .unrecognized-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .unrecognized-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .unrecognized-item select {
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .shopping-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 16px 16px 170px 16px;
+            }
+
+            .sticky-footer {
+                bottom: 16px;
+                width: calc(100% - 32px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 12px 170px 12px;
+            }
+
+            .shopping-list {
+                padding: 16px;
+            }
+
+            .item {
+                gap: 10px;
+                padding: 10px 12px;
+            }
+
+            .sticky-footer {
+                bottom: 12px;
+                width: calc(100% - 24px);
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 10px 10px 170px 10px;
+            }
+
+            .shopping-list {
+                padding: 14px;
+            }
+
+            .item {
+                gap: 8px;
+                padding: 9px 10px;
+            }
+
+            .sticky-footer {
+                bottom: 10px;
+                width: calc(100% - 20px);
+            }
+        }
+
+        @media (max-width: 360px) {
+            body {
+                padding: 8px 8px 170px 8px;
+            }
+
+            .shopping-list {
+                padding: 12px;
+            }
+
+            .item {
+                gap: 8px;
+                padding: 8px;
+            }
+
+            .sticky-footer {
+                bottom: 8px;
+                width: calc(100% - 16px);
+                padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+            }
+
+            .action-buttons {
+                gap: 4px;
+            }
+
+            .icon-btn {
+                padding: 6px 4px;
+                font-size: 18px;
+            }
+
+            #searchInput {
+                padding: 10px;
+                padding-right: 40px;
+                font-size: 15px;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 id="app-title">Handle Litt</h1>
+            </div>
+            <div style="position: relative;">
+                <button class="burger-menu-btn" onclick="toggleBurgerMenu()" aria-label="Meny">☰</button>
+                <div id="burgerMenu" class="burger-menu" style="display: none;">
+                    <button class="burger-menu-item" onclick="showInfoModal(); closeBurgerMenu();" id="burger-about">
+                        Om
+                    </button>
+                    <div style="border-top: 1px solid rgba(0,0,0,0.1); margin: 4px 0;"></div>
+                    <button class="burger-menu-item" onclick="setLanguage('no'); closeBurgerMenu();" id="burger-lang-no">
+                        Norsk
+                    </button>
+                    <button class="burger-menu-item" onclick="setLanguage('en'); closeBurgerMenu();" id="burger-lang-en">
+                        English
+                    </button>
+                    <div style="border-top: 1px solid rgba(0,0,0,0.1); margin: 4px 0;"></div>
+                    <button class="burger-menu-item" onclick="window.location.href='admin.html'">
+                        Admin
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="adhd-explanation">
+            <p id="adhd-text"></p>
+        </div>
+
+        <div class="controls" style="display: none;">
+            <div id="previewSection" style="margin-top: 16px;">
+                <div class="preview-header">Gjenkjente varer (<span id="inlineRecognizedCount">0</span>):</div>
+                <div class="preview-items" id="inlineRecognizedItems" style="margin-bottom: 12px;"></div>
+
+                <div id="inlineUnrecognizedContainer" style="display: none;">
+                    <div class="preview-header">Ukjente varer - velg kategori:</div>
+                    <div id="inlineUnrecognizedItems" style="margin-bottom: 12px;"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" id="addAllBtn" onclick="addParsedItems()" style="flex: 1;">✅ Legg til alle</button>
+                    <button class="btn-secondary" id="cancelBtn" onclick="cancelBulkInput()" style="flex: 1;">Avbryt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="shopping-list" id="shoppingList">
+        </div>
+    </div>
+
+    <!-- Sticky Footer -->
+    <div class="sticky-footer">
+        <div class="search-container">
+            <textarea id="searchInput" placeholder="Lim inn kaos eller enkeltvarer her" rows="1"></textarea>
+            <div id="autocomplete"></div>
+        </div>
+        <div class="action-buttons">
+            <button class="icon-btn" id="shareBtn" aria-label="Del liste" title="Del liste" onclick="shareList()">
+                👥
+            </button>
+            <button class="icon-btn" id="importBtn" aria-label="Koble til liste" title="Koble til liste" onclick="showImportModal()">
+                🔗
+            </button>
+            <button class="icon-btn" id="clearBtn" aria-label="Tøm liste" title="Tøm liste" onclick="clearList()">
+                🗑️
+            </button>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeShareModal()">×</button>
+            <h2 class="modal-header" id="shareModalTitle">Del handleliste</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;" id="shareCodeLabel">Del denne koden:</label>
+                <input type="text" id="shareCode" readonly style="width: 100%; padding: 20px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: monospace; font-size: 32px; background: rgba(0,0,0,0.02); text-align: center; letter-spacing: 6px; font-weight: bold;">
+                <button class="btn-primary" onclick="copyShareCode()" style="margin-top: 10px; width: 100%;" id="copyCodeBtn">📋 Kopier kode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sharing Toggle Modal (for Listesjef) -->
+    <div class="modal" id="sharingToggleModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSharingToggleModal()">×</button>
+            <h2 class="modal-header">Administrer deling</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Delekode:</label>
+                <input type="text" id="toggleShareCode" readonly style="width: 100%; padding: 16px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: monospace; font-size: 24px; background: rgba(0,0,0,0.02); text-align: center; letter-spacing: 4px; font-weight: bold; margin-bottom: 16px;">
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; font-size: 14px;">Aktive brukere:</div>
+                    <div id="modalParticipantsList" style="background: rgba(0,0,0,0.02); border-radius: 8px; padding: 12px; max-height: 150px; overflow-y: auto;">
+                        <div style="color: #86868b; font-size: 13px;">Laster...</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: center; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 16px;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">Deling aktiv</div>
+                        <div style="font-size: 13px; color: #86868b;" id="sharingStatusText">Andre kan koble seg til med koden</div>
+                    </div>
+                    <button id="toggleSharingBtn" onclick="toggleSharing()" style="padding: 12px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 15px;">
+                        Deaktiver
+                    </button>
+                </div>
+
+                <button class="btn-secondary" onclick="closeSharingToggleModal()" style="width: 100%;">Lukk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeImportModal()">×</button>
+            <h2 class="modal-header" id="importModalTitle">Importer handleliste</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;" id="importCodeLabel">Lim inn kode:</label>
+                <input type="text" id="importCode" placeholder="Lim inn kode her..." style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: monospace; font-size: 13px;">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="importList()">✅ Importer</button>
+                <button class="btn-secondary" onclick="closeImportModal()">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeInfoModal()">×</button>
+            <h2 class="modal-header" id="aboutModalTitle">Om Handle Litt</h2>
+            <div style="color: #1d1d1f; line-height: 1.6;">
+                <p style="margin: 0 0 24px 0; font-size: 15px;" id="aboutModalPrivacy">
+                    🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.
+                </p>
+                <p style="margin: 0; font-size: 12px; color: #86868b;">
+                    <span id="aboutModalCredit">Et lite prosjekt av Hallvar Bugge Johnsen</span><br>
+                    <a href="mailto:hei@hallvar.no" style="color: var(--primary); text-decoration: none;">hei@hallvar.no</a>
+                </p>
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="btn-primary" onclick="closeInfoModal()" style="width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeNoteModal()">×</button>
+            <h2 class="modal-header" id="noteModalTitle">Rediger notat</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;" id="noteItemName"></label>
+                <input type="text" id="noteInput" placeholder="F.eks: 4 stk, 2 kg, økologisk..." style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-size: 15px;">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="saveNote()">✅ Lagre</button>
+                <button class="btn-secondary" onclick="closeNoteModal()">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Selection Modal -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCategoryModal()">×</button>
+            <h2 class="modal-header">Velg kategori</h2>
+            <p style="margin-bottom: 16px; color: #86868b;">Hvilken kategori hører "<span id="categoryItemName" style="font-weight: 600; color: #1d1d1f;"></span>" til?</p>
+            <div id="categoryButtons" style="display: grid; gap: 8px; margin-bottom: 16px;"></div>
+            <button class="btn-secondary" onclick="createNewCategory()" style="width: 100%; margin-top: 8px;">➕ Opprett ny kategori</button>
+            <button class="btn-secondary" onclick="closeCategoryModal()" style="width: 100%; margin-top: 8px;">Avbryt</button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyASf48sq804zm9GD0cVMnN3ZLnjlKLog-4",
+            authDomain: "handle-litt.firebaseapp.com",
+            projectId: "handle-litt",
+            storageBucket: "handle-litt.firebasestorage.app",
+            messagingSenderId: "16911445254",
+            appId: "1:16911445254:web:456f1aa3c524632e2f0287",
+            measurementId: "G-P4GFWBFM3S"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const functions = firebase.functions();
+
+        // Enable offline persistence
+        db.enablePersistence({ synchronizeTabs: true })
+            .catch(err => {
+                if (err.code === 'failed-precondition') {
+                    console.warn('Persistence failed: Multiple tabs open');
+                } else if (err.code === 'unimplemented') {
+                    console.warn('Persistence not supported by browser');
+                }
+            });
+
+        let currentLanguage = localStorage.getItem('language') || 'no';
+
+        const TRANSLATIONS = {
+            no: {
+                appTitle: 'Handle Litt',
+                appSubtitle: 'Lim inn handleliste eller søk etter enkelvarer',
+                searchPlaceholder: 'Lim inn kaos eller enkeltvarer her',
+                clearListBtn: '🗑️ Tøm liste',
+                shareListBtn: '📤 Del liste',
+                importListBtn: '🔗 Koble til liste',
+                addAllBtn: '✅ Legg til alle',
+                cancelBtn: 'Avbryt',
+                shareModalTitle: 'Del handleliste',
+                shareCodeLabel: 'Del denne koden:',
+                copyCodeBtn: '📋 Kopier kode',
+                importModalTitle: 'Importer handleliste',
+                importCodeLabel: 'Lim inn kode:',
+                importCodePlaceholder: 'Lim inn kode her...',
+                importBtn: '✅ Importer',
+                codeCopied: 'Kode kopiert!',
+                importSuccess: 'Handleliste importert!',
+                importError: 'Ugyldig kode. Vennligst prøv igjen.',
+                recognizedItems: 'Gjenkjente varer',
+                unknownItems: 'Ukjente varer - velg kategori',
+                selectCategory: 'Velg kategori',
+                noItemsYet: 'Ingen varer lagt til ennå.',
+                noItemsDesc: 'Lim inn en liste eller søk etter enkelvarer i feltet over',
+                alertSelectCategory: 'Vennligst velg kategori for alle ukjente varer!',
+                alertConfirmClear: 'Er du sikker på at du vil tømme hele listen?',
+                alertListEmpty: 'Listen er allerede tom!',
+                alertEmptyBeforeShare: 'Legg til en vare i listen før du deler',
+                alertShared: 'Listen er nå delt! Del lenken eller QR-koden med andre.',
+                adhdExplanation: 'Surrer du på kryss og tvers i butikken? Her kan du lime inn en usortert handleliste, og Handle Litt vil sortere den etter kategorier🔥',
+                categories: {
+                    'Laktosefri/Glutenfri': '🥛 Laktosefri/Glutenfri',
+                    'Frukt & Grønt': '🥬 Frukt & Grønt',
+                    'Kjøtt & Fisk': '🥩 Kjøtt & Fisk',
+                    'Pålegg': '🧈 Pålegg',
+                    'Meieri & Kjøl': '🥛 Meieri & Kjøl',
+                    'Brød & Bakervarer': '🍞 Brød & Bakervarer',
+                    'Tørrvarelager & Hermetikk': '🥫 Tørrvarelager & Hermetikk',
+                    'Fryste varer': '🧊 Fryste varer',
+                    'Urter & Krydder': '🌿 Urter & Krydder',
+                    'Drikke': '🥤 Drikke',
+                    'Godteri & Snacks': '🍬 Godteri & Snacks',
+                    'Husholdning & Rengjøring': '🧹 Husholdning & Rengjøring',
+                    'Vinmonopolet': '🍷 Vinmonopolet',
+                    'Kontorartikler': '📎 Kontorartikler',
+                    'Elektronikk': '🔌 Elektronikk',
+                    'Apotek': '💊 Apotek',
+                    'Møbelbutikk': '🛋️ Møbelbutikk',
+                    'Skredder': '🧵 Skredder',
+                    'Bensinstasjon': '⛽ Bensinstasjon',
+                    'Post': '📮 Post',
+                    'Diverse': '📦 Diverse'
+                },
+                footerCredit: 'Et lite prosjekt av Hallvar Bugge Johnsen',
+                privacyNotice: '🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.',
+                participants: 'Deltakere:',
+                about: 'Om',
+                aboutModalTitle: 'Om Handle Litt',
+                aboutModalCredit: 'Et lite prosjekt av Hallvar Bugge Johnsen',
+                aboutModalPrivacy: '🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.'
+            },
+            en: {
+                appTitle: 'Handle Litt',
+                appSubtitle: 'Paste your list or search for items',
+                searchPlaceholder: 'Paste chaos or individual items here',
+                clearListBtn: '🗑️ Clear list',
+                shareListBtn: '📤 Share list',
+                importListBtn: '🔗 Join list',
+                addAllBtn: '✅ Add all',
+                cancelBtn: 'Cancel',
+                shareModalTitle: 'Share shopping list',
+                shareCodeLabel: 'Share this code:',
+                copyCodeBtn: '📋 Copy code',
+                importModalTitle: 'Import shopping list',
+                importCodeLabel: 'Paste code:',
+                importCodePlaceholder: 'Paste code here...',
+                importBtn: '✅ Import',
+                codeCopied: 'Code copied!',
+                importSuccess: 'Shopping list imported!',
+                importError: 'Invalid code. Please try again.',
+                recognizedItems: 'Recognized items',
+                unknownItems: 'Unknown items - select category',
+                selectCategory: 'Select category',
+                noItemsYet: 'No items added yet.',
+                noItemsDesc: 'Paste a list or search for items in the field above',
+                alertSelectCategory: 'Please select category for all unknown items!',
+                alertConfirmClear: 'Are you sure you want to clear the entire list?',
+                alertListEmpty: 'The list is already empty!',
+                alertEmptyBeforeShare: 'Add an item to the list before sharing',
+                alertShared: 'List is now shared! Share the link or QR code with others.',
+                adhdExplanation: 'Shopping in circles? Here you can paste an unsorted shopping list, and Handle Litt will sort it by categories🔥',
+                categories: {
+                    'Laktosefri/Glutenfri': '🥛 Lactose/Gluten-Free',
+                    'Frukt & Grønt': '🥬 Fruits & Vegetables',
+                    'Kjøtt & Fisk': '🥩 Meat & Fish',
+                    'Pålegg': '🧈 Deli & Spreads',
+                    'Meieri & Kjøl': '🥛 Dairy & Refrigerated',
+                    'Brød & Bakervarer': '🍞 Bread & Bakery',
+                    'Tørrvarelager & Hermetikk': '🥫 Pantry & Canned Goods',
+                    'Fryste varer': '🧊 Frozen Foods',
+                    'Urter & Krydder': '🌿 Herbs & Spices',
+                    'Drikke': '🥤 Beverages',
+                    'Godteri & Snacks': '🍬 Candy & Snacks',
+                    'Husholdning & Rengjøring': '🧹 Household & Cleaning',
+                    'Vinmonopolet': '🍷 Liquor Store',
+                    'Kontorartikler': '📎 Office Supplies',
+                    'Elektronikk': '🔌 Electronics',
+                    'Apotek': '💊 Pharmacy',
+                    'Møbelbutikk': '🛋️ Furniture Store',
+                    'Skredder': '🧵 Tailor',
+                    'Bensinstasjon': '⛽ Gas Station',
+                    'Post': '📮 Post Office',
+                    'Diverse': '📦 Miscellaneous'
+                },
+                footerCredit: 'A small project by Hallvar Bugge Johnsen',
+                privacyNotice: '🔒 Your list is stored locally on your device. When you share it, it is stored online for 30 days for real-time sync.',
+                participants: 'Participants:',
+                about: 'About',
+                aboutModalTitle: 'About Handle Litt',
+                aboutModalCredit: 'A small project by Hallvar Bugge Johnsen',
+                aboutModalPrivacy: '🔒 Your list is stored locally on your device. When you share it, it is stored online for 30 days for real-time sync.'
+            }
+        };
+
+        const CATEGORIES = [
+            'Laktosefri/Glutenfri',
+            'Frukt & Grønt',
+            'Kjøtt & Fisk',
+            'Pålegg',
+            'Meieri & Kjøl',
+            'Brød & Bakervarer',
+            'Tørrvarelager & Hermetikk',
+            'Fryste varer',
+            'Urter & Krydder',
+            'Drikke',
+            'Godteri & Snacks',
+            'Husholdning & Rengjøring',
+            'Vinmonopolet',
+            'Kontorartikler',
+            'Elektronikk',
+            'Apotek',
+            'Baby',
+            'Møbelbutikk',
+            'Skredder',
+            'Bensinstasjon',
+            'Post',
+            'Diverse'
+        ];
+
+        const DATABASE = {
+            'Laktosefri/Glutenfri': [
+                'laktosefri melk', 'laktosefri yoghurt', 'laktosefri smør', 'laktosefri rømme',
+                'laktosefri ost', 'laktosefri fløte', 'laktosefri iskrem', 'laktosefri sjokolade',
+                'glutenfri brød', 'glutenfri pasta', 'glutenfri mel', 'glutenfri kjeks',
+                'glutenfri pizza', 'glutenfri müsli', 'glutenfri havregryn', 'glutenfri kaker',
+                'vegansk melk', 'havrmelk', 'mandelmelk', 'sojamelk', 'kokosmelk',
+                'vegansk ost', 'vegansk smør', 'vegansk yoghurt'
+            ],
+            'Frukt & Grønt': [
+                'eple', 'banan', 'appelsin', 'pære', 'drue', 'kiwi', 'mango', 'ananas', 'melon', 'vannmelon',
+                'sitron', 'lime', 'grapefrukt', 'klementiner', 'mandarin', 'persimmon', 'avokado', 'papaya',
+                'gulrot', 'tomat', 'agurk', 'paprika', 'salat', 'isbergsalat', 'ruccola', 'spinat', 'grønnkål',
+                'brokkoli', 'blomkål', 'løk', 'rødløk', 'hvitløk', 'ingefær', 'chili', 'squash', 'zucchini',
+                'purre', 'selleri', 'kålrot', 'nepe', 'rødbete', 'hodekål', 'rosenkål', 'søtpotet', 'potet',
+                'asparges', 'mais', 'erter', 'søtpotet', 'sopp', 'sjampinjong', 'østerssopp', 'kantarell'
+            ],
+            'Kjøtt & Fisk': [
+                'kyllingfilet', 'kyllinglår', 'kyllingvinger', 'hel kylling', 'kalkunfilet', 'kalkun',
+                'kjøttdeig', 'storfekjøtt', 'indrefilet', 'mørbrad', 'ytrefilet', 'entrecôte', 'storfefilet',
+                'koteletter', 'svinekoteletter', 'lammekoteletter', 'pulled pork', 'flesk',
+                'lammekjøtt', 'lammestek', 'reinsdyrskjøtt', 'elgkjøtt', 'pølser', 'grillpølser',
+                'laks', 'ørret', 'torsk', 'sei', 'hyse', 'kveite', 'sild', 'reker',
+                'krabbe', 'kongekrabbe', 'hummer', 'blåskjell', 'kamskjell', 'fiskeboller', 'fiskekaker', 'surimi'
+            ],
+            'Pålegg': [
+                'servelat', 'salami', 'spekeskinke', 'kokt skinke', 'røkt kalkun', 'kalkunpålegg', 'roastbiff',
+                'leverpostei', 'leverpostei med bacon', 'svineleverpostei', 'kalkunleverpostei', 'bacon',
+                'makrell i tomat', 'sardiner i tomat', 'kaviar', 'rømmelaks', 'røkelaks', 'gravlaks',
+                'ansjosfilet', 'tunfisksalat', 'rekesalat', 'eggesalat', 'kyllingsalat',
+                'hummus', 'pesto', 'tapenade', 'pepperrot', 'sennep', 'agurksalat'
+            ],
+            'Meieri & Kjøl': [
+                'melk', 'lettmelk', 'skummet melk', 'helmelk', 'ekstra lett melk', 'kulturmelk', 'kefir',
+                'fløte', 'matfløte', 'kremfløte', 'piskefløte', 'crème fraiche', 'rømme', 'lett rømme', 'kesam',
+                'yoghurt', 'gresk yoghurt', 'naturell yoghurt', 'fruktyhgurt',
+                'ost', 'hvitost', 'gulost', 'norvegia', 'jarlsberg', 'cheddar', 'mozzarella', 'parmesan',
+                'brie', 'camembert', 'feta', 'cottage cheese', 'kremost', 'smøreost', 'blåmuggost', 'geitost',
+                'smør', 'margarin', 'bremykt', 'meierismør', 'lettmargarin',
+                'egg', 'eggehvite', 'majones', 'aioli', 'remulade', 'chilimajones'
+            ],
+            'Brød & Bakervarer': [
+                'brød', 'loff', 'rundstykker', 'baguett', 'ciabatta', 'focaccia', 'grovbrød', 'kneippbrød',
+                'byggbrød', 'havregrøt', 'havrebrød', 'pitabrød', 'tortilla', 'wraps',
+                'bagel', 'croissant', 'bolle', 'kanelboller', 'wienbrød', 'skolebrød', 'kaker', 'wienerbrød',
+                'knekkebrød', 'kavring', 'kornkjeks', 'kjeks', 'riskjeks', 'havregrøtmel', 'müsli', 'frokostblanding',
+                'cornflakes', 'havregryn', 'havregrynspudding', 'mandelskiver', 'mandelflak', 'sjokoladebiter', 'sjokoladedråper'
+            ],
+            'Tørrvarelager & Hermetikk': [
+                'pasta', 'spaghetti', 'makaroni', 'penne', 'fusilli', 'lasagneplater', 'tortellini', 'ravioli',
+                'ris', 'jasminris', 'basmatiris', 'risotto', 'parboiled ris', 'sushiris',
+                'mel', 'hvetemel', 'sammalt hvete', 'glutenfritt mel', 'mandelmel', 'siktet sammalt hvete',
+                'sukker', 'melis', 'flormelis', 'brunt sukker', 'rørsukker', 'honning', 'sirup', 'agavesirup',
+                'havsalt', 'bordsalt', 'pepper', 'paprika', 'karri', 'kanel', 'muskatnøtt', 'nellik',
+                'bakepulver', 'natron', 'vaniljesukker', 'vaniljestang', 'gjær', 'tørrgjær', 'kakao',
+                'hermetiske tomater', 'tomatpure', 'tomatketchup', 'hermetisk mais', 'hermetiske erter',
+                'hermetiske kikerter', 'hermetiske bønner', 'hermetisk tunfisk', 'hermetisk makrell', 'hermetisk ananas',
+                'kokosmelk', 'hermetisk kokosmelk',
+                'pesto', 'tapenade', 'olivenolje', 'rapsolje', 'kokosolje', 'smørolje', 'solsikkeolje',
+                'eddik', 'balsamicoeddik', 'rødvinseddik', 'eplesidereddik', 'soyasaus', 'fiskesaus', 'osterssaus',
+                'buljong', 'kraft', 'hønsekraft', 'grønnsakskraft', 'biff', 'peanøttsmør', 'hazelnut spread', 'nutella',
+                'syltetøy', 'jordbærsyltetøy', 'bringebærsyltetøy', 'aprikos syltetøy', 'appelsinmarmelade',
+                'müslibarer', 'proteinbarer', 'nøtter', 'mandler', 'cashewnøtter', 'peanøtter', 'hasselnøtter',
+                'rosiner', 'tørkede aprikoser', 'tørkede kranbær', 'tørket frukt'
+            ],
+            'Fryste varer': [
+                'frosne erter', 'frosne grønnsaker', 'frosne grønnsaksblandinger', 'frosne bær', 'frosne jordbær',
+                'frosne blåbær', 'frosne bringebær', 'frosne tyttebær', 'frosne mango', 'frosne bærblandinger',
+                'pizza', 'grandiosa', 'ferdigmat', 'lasagne', 'fiskegrateng', 'pytt i panne', 'tacokjøtt',
+                'is', 'iskrem', 'sorbét', 'pinneis', 'ispinne', 'isvafler',
+                'pommes frites', 'potetbåter', 'potetskiver', 'kroketter', 'fiskefileter', 'fiskepinner',
+                'panert fisk', 'frossenpudding'
+            ],
+            'Urter & Krydder': [
+                'salt', 'pepper', 'basilikum', 'oregano', 'timian', 'rosmarin', 'persille', 'koriander',
+                'dill', 'gressløk', 'mynta', 'salvie', 'estragon', 'laurbærblad', 'karri', 'karripasta',
+                'kurkuma', 'spisskummen', 'koriafrø', 'chiliflak', 'chipotle', 'cayennepepper',
+                'paprikapulver', 'søt paprika', 'røkt paprika', 'hvitløkspulver', 'løkpulver',
+                'muskatnøtt', 'kardemomme', 'nellik', 'stjerneanis', 'kanel', 'vaniljesukker', 'ingefær',
+                'sesamfrø', 'valmuefrø', 'solsikkefrø', 'gresskarkjerner', 'chiafrø', 'linfrø'
+            ],
+            'Drikke': [
+                'vann', 'kildevann', 'kullsyreholdig vann', 'mineralvann', 'brus', 'cola', 'solo', 'fanta',
+                'sprite', 'pepsi', 'saft', 'eplejuice', 'appelsinjuice', 'juice', 'smoothie',
+                'kaffe', 'kaffebønner', 'filterkaffe', 'espresso', 'te', 'grønn te', 'svart te', 'urte te',
+                'kakao', 'sjokolademelk', 'energidrikk', 'sportsdrikk', 'proteinshake', 'kokosvann',
+                'øl', 'pilsner', 'lager', 'alkoholfri øl', 'alkoholfri vin', 'lettøl'
+            ],
+            'Godteri & Snacks': [
+                'sjokolade', 'melkesjokolade', 'mørk sjokolade', 'kvikk lunsj', 'stratos', 'freia melkesjokolade',
+                'twist', 'smash', 'non stop', 'center', 'marianne', 'drops', 'mintedropser',
+                'godteri', 'vingummi', 'gelé', 'lakris', 'salt lakris', 'søt lakris', 'lollipop', 'pastiller',
+                'tyggis', 'popcorn', 'mikropopcorn', 'chips', 'potetchips', 'sørlandschips', 'maarud',
+                'nachos', 'tortillachips', 'salsa', 'guacamole', 'dipp', 'peanøtter', 'salte peanøtter',
+                'cashewnøtter', 'nøtteblanding', 'studenthaver', 'trail mix', 'kjeks', 'småkjeks',
+                'sørlandskjeks', 'digestive', 'ballerina', 'havrekjeks'
+            ],
+            'Husholdning & Rengjøring': [
+                'oppvaskmiddel', 'oppvaskmaskinmiddel', 'oppvaskmaskin tabletter', 'oppvaskbørste', 'oppvaskklut',
+                'tørk', 'rengjøring', 'allrens', 'såpe', 'såpepumpe', 'toalettpapir', 'dopapir', 'kjøkkenruller',
+                'papirhåndkle', 'servietter', 'våtservietter', 'kluter', 'filler', 'svamp', 'skuresvamp',
+                'skurepulver', 'klorin', 'klorkluter', 'desinfeksjon', 'gulvvask', 'vindusrens', 'glassrens',
+                'badrens', 'kalkfjerner', 'universal rengjøringsmiddel', 'ovnsrens', 'komfyrrens',
+                'tøyvask', 'vaskemiddel', 'flytende vaskemiddel', 'tøymykner', 'fargeark', 'vaskepulver',
+                'såpeflak', 'flekktjerner', 'blekmiddel', 'uldvask',
+                'søppelposer', 'matposer', 'fryseposer', 'brødposer', 'aluminiumsfolie', 'plastfolie', 'bakepapir'
+            ],
+            'Vinmonopolet': [
+                'sterkøl', 'ipa', 'pale ale', 'stout', 'porter', 'brown ale', 'wheat beer', 'witbier',
+                'vin', 'rødvin', 'hvitvin', 'rosévin', 'musserende vin', 'champagne', 'prosecco', 'cava',
+                'cider', 'eplesider', 'pærecider',
+                'brennevin', 'vodka', 'whisky', 'gin', 'rom', 'tequila', 'cognac', 'likør', 'baileys', 'kahlua',
+                'aperol', 'campari', 'vermut', 'sherry', 'portvin', 'madeira'
+            ],
+            'Kontorartikler': [
+                'kulepenn', 'blyant', 'viskelær', 'notisblokk', 'post-it', 'lapper', 'ringperm', 'plastlommer',
+                'clips', 'binders', 'stifter', 'stiftepistol', 'hullmaskin', 'teip', 'tape', 'dobbeltsidig tape',
+                'kalkulator', 'saks', 'kontorsaks', 'linjal', 'lim', 'limstift', 'tusj', 'marker', 'highlighter',
+                'A4 papir', 'skrivepapir', 'konvolutt', 'hvite konvolutter', 'brune konvolutter', 'etiketter',
+                'merkelapper'
+            ],
+            'Elektronikk': [
+                'batterier', 'AA batterier', 'AAA batterier', '9V batteri', 'knappeceller', 'CR2032',
+                'USB-kabel', 'USB-C kabel', 'Lightning kabel', 'micro-USB kabel', 'USB-A til USB-C',
+                'ladeadapter', 'strømadapter', 'hurtiglader', 'USB-lader', 'veggkontakt lader',
+                'HDMI-kabel', 'skjøteledning', 'ståledning', 'forlengerkabel', 'strømkabel',
+                'hodetelefoner', 'ørepropper', 'trådløse hodetelefoner', 'AirPods', 'earbuds',
+                'powerbank', 'batteribank', 'ekstern batteri', 'portable lader',
+                'minnekort', 'SD-kort', 'microSD', 'USB-minnepinne', 'USB-stick',
+                'adapter', 'strømadapter', 'reiseadapter', 'USB-adapter',
+                'sikring', 'grenut tak', 'stikkontakt', 'skjøteledning',
+                'smartpære', 'LED-pære smart', 'smarthøyttaler', 'fjernkontroll',
+                'mobilholder', 'mobilholder bil', 'mobillader', 'trådløs lader'
+            ],
+            'Apotek': [
+                'øyedråper', 'nesespray', 'smertestillende', 'paracet', 'ibux', 'treo',
+                'plaster', 'bandasje', 'kompresser', 'salvekompresser',
+                'krem', 'salvekrem', 'sårsalve', 'fuktighetskrem', 'solkrem',
+                'medisin', 'resept', 'vitaminer', 'tran', 'kosttilskudd',
+                'allergimedisin', 'cetirizin', 'antihistamin',
+                'hostesaft', 'halstabletter', 'nesespray saltvann',
+                'termometer', 'blodtrykksmåler', 'sprøyter', 'hansker',
+                'kodesalve', 'tigerbalsam', 'vicks', 'apotex'
+            ],
+            'Baby': [
+                'bleier', 'bleieskift', 'bleieposer', 'stelleunderlag',
+                'våtservietter', 'stellekluter våt', 'stellekluter tørr', 'babyvaskekluter',
+                'babykrem', 'bleiekrem', 'sinkrem', 'babysalve', 'babybadolje', 'badeolje baby',
+                'babyshampoo', 'shampoo baby', 'såpe baby', 'babysåpe', 'babybad',
+                'melkeerstatning', 'morsmelkerstatning', 'babymelk', 'tilvenningsmåltid',
+                'babygrøt', 'babymat', 'babymos', 'fruktmos', 'grønnsaksmos', 'kjøttmos',
+                'babysmoothie', 'smoothie baby', 'juice baby', 'babyjuice',
+                'smokk', 'smokker', 'narresmoкк', 'tåteflaske', 'babyflaske', 'nappeflaske',
+                'flaskebørste', 'flaskerengjøring', 'smokkholder', 'smokkesnor',
+                'haklapp', 'smekke', 'babyhåndkle', 'babybadehåndkle',
+                'babylysestumper', 'babyskap', 'babylotion', 'babypudder',
+                'babytannbørste', 'tannbørste baby', 'tannkrem baby', 'babytannkrem',
+                'barneplate', 'babyskje', 'babyservice', 'barnegaffel', 'drikketut',
+                'bæresele', 'babynest', 'babyteppe', 'babyfilt',
+                'leker', 'biteleker', 'kosedyr', 'babybøker', 'aktivitetsleker'
+            ],
+            'Møbelbutikk': [
+                'lyspære', 'LED pære', 'sparepære', 'halogen pære', 'E27 pære', 'E14 pære', 'GU10 pære',
+                'stueplanter', 'potteplanter', 'blomsterpotte', 'blomsterkrukke', 'plantepotte', 'kaktus',
+                'pute', 'sofapute', 'prydspute', 'putevår', 'pledd', 'ullteppe', 'fleeceteppe',
+                'gardin', 'persienne', 'rullegardin', 'gardinkrok', 'gardinhengsler', 'gardinstang',
+                'bilderamme', 'fotoramme', 'veggdekor', 'speil', 'veggspeil',
+                'stearinlys', 'tente lys', 'duftlys', 'fyrfadslys', 'kubbelys', 'kronelys', 'lighter', 'fyrstikker',
+                'kurv', 'oppbevaringskurv', 'flettekurv', 'vase', 'glassvase', 'keramikvase',
+                'matte', 'teppe', 'dørmatte', 'badematte', 'teppeunderlag'
+            ],
+            'Skredder': [
+                'tråd', 'symaskintråd', 'bomullstråd', 'polyestertråd', 'nål', 'synål', 'håndsynål', 'maskinnål',
+                'knapp', 'knapper', 'trykknapp', 'glidelås', 'lynlås', 'saks', 'stoffsaks', 'trådsaks',
+                'målebånd', 'symeterbånd', 'stoppetråd', 'ulltråd', 'garn', 'strikketøy', 'strikkegarn',
+                'strikkepinner', 'rundpinner', 'heklenål', 'knappenål', 'sikkerhetsnål', 'sømriper',
+                'stoff', 'bomullsstoff', 'jersey', 'fleece', 'filterstoff'
+            ],
+            'Bensinstasjon': [
+                'bensin', '95 oktan', '98 oktan', 'diesel', 'biodiesel', 'spylevæske', 'vindusspylevæske',
+                'motorolje', 'bilstell', 'bilshampoo', 'issskrape', 'isskrape', 'ispray', 'aviser',
+                'luftfrisker bil', 'bilparfyme', 'bilduft', 'vaskeklut', 'bilklut', 'mikrofiberklut',
+                'kaffe', 'varm pølse', 'pølse', 'varmmat', 'nachos', 'energidrikk', 'redbull', 'battery',
+                'lightere', 'isbit', 'energibar', 'kjølevæske', 'bremsevæske', 'startkabler'
+            ],
+            'Post': [
+                'pakke', 'pakke med hentekode', 'hente pakke', 'post', 'posten',
+                'brev', 'postkort', 'frimerker', 'frimerke', 'A-post frimerke', 'B-post frimerke', 'porto', 'portosats',
+                'pakkepost', 'brevpost', 'rekommandert', 'returpost',
+                'konvolutt', 'C5 konvolutt', 'C4 konvolutt', 'boblekonvolutt', 'luftekonvolutt',
+                'pakketape', 'brunt tape', 'emballasjeteip', 'pakkepapir', 'bobleplast',
+                'eske', 'pappkasse', 'pappeske', 'pakkelapp', 'adresseetikett', 'adresselapp',
+                'tollpapir', 'tolldeklarasjon', 'CN23', 'avsenderlapp', 'returlapp',
+                'blyant', 'brevvekt', 'plastpose', 'pakkepose', 'postsekk'
+            ],
+            'Diverse': [
+                'gavepapir', 'gavepose', 'gavebånd', 'sløyfe', 'gave etikett', 'kort', 'bursdagskort',
+                'gratulasjonskort', 'takkekort', 'invitasjon', 'konvolutt', 'ballonger', 'servietter',
+                'festservietter', 'papirbord', 'papptallerkener', 'plastkopper', 'papirkopper', 'sugerør',
+                'festpynt', 'girlander', 'vimpel', 'konfetti', 'stearinlys', 'telys', 'festlys', 'kakedekorasjon'
+            ]
+        };
+
+        const DATABASE_EN = {
+            'Laktosefri/Glutenfri': [
+                'lactose free milk', 'lactose free yogurt', 'lactose free butter', 'lactose free sour cream',
+                'lactose free cheese', 'lactose free cream', 'lactose free ice cream', 'lactose free chocolate',
+                'gluten free bread', 'gluten free pasta', 'gluten free flour', 'gluten free cookies',
+                'gluten free pizza', 'gluten free muesli', 'gluten free oats', 'gluten free cakes',
+                'vegan milk', 'oat milk', 'almond milk', 'soy milk', 'coconut milk',
+                'vegan cheese', 'vegan butter', 'vegan yogurt'
+            ],
+            'Frukt & Grønt': [
+                'apple', 'banana', 'orange', 'pear', 'grape', 'kiwi', 'mango', 'pineapple', 'melon', 'watermelon',
+                'lemon', 'lime', 'grapefruit', 'clementine', 'mandarin', 'persimmon', 'avocado', 'papaya',
+                'carrot', 'tomato', 'cucumber', 'bell pepper', 'lettuce', 'iceberg lettuce', 'arugula', 'spinach', 'kale',
+                'broccoli', 'cauliflower', 'onion', 'red onion', 'garlic', 'ginger', 'chili', 'squash', 'zucchini',
+                'leek', 'celery', 'rutabaga', 'turnip', 'beetroot', 'cabbage', 'brussels sprouts', 'sweet potato', 'potato',
+                'asparagus', 'corn', 'peas', 'yam', 'mushroom', 'button mushroom', 'oyster mushroom', 'chanterelle'
+            ],
+            'Kjøtt & Fisk': [
+                'chicken breast', 'chicken thighs', 'chicken wings', 'whole chicken', 'turkey breast', 'turkey',
+                'ground beef', 'beef', 'tenderloin', 'pork tenderloin', 'sirloin', 'ribeye', 'beef fillet',
+                'chops', 'pork chops', 'lamb chops', 'pulled pork', 'pork',
+                'lamb', 'lamb roast', 'reindeer meat', 'venison', 'sausages', 'grilling sausages',
+                'salmon', 'trout', 'cod', 'saithe', 'haddock', 'halibut', 'herring', 'shrimp',
+                'crab', 'king crab', 'lobster', 'mussels', 'scallops', 'fish balls', 'fish cakes', 'surimi'
+            ],
+            'Pålegg': [
+                'salami', 'salami', 'cured ham', 'cooked ham', 'smoked turkey', 'turkey slices', 'roast beef',
+                'liver pate', 'liver pate with bacon', 'pork liver pate', 'turkey liver pate', 'bacon',
+                'mackerel in tomato', 'sardines in tomato', 'caviar', 'sour cream salmon', 'smoked salmon', 'cured salmon',
+                'anchovy fillets', 'tuna salad', 'shrimp salad', 'egg salad', 'chicken salad',
+                'hummus', 'pesto', 'tapenade', 'horseradish', 'mustard', 'pickled cucumber'
+            ],
+            'Meieri & Kjøl': [
+                'milk', 'low fat milk', 'skim milk', 'whole milk', 'extra light milk', 'cultured milk', 'kefir',
+                'cream', 'cooking cream', 'double cream', 'whipping cream', 'crème fraiche', 'sour cream', 'light sour cream', 'cottage cheese',
+                'yogurt', 'greek yogurt', 'natural yogurt', 'fruit yogurt',
+                'cheese', 'white cheese', 'yellow cheese', 'norvegia', 'jarlsberg', 'cheddar', 'mozzarella', 'parmesan',
+                'brie', 'camembert', 'feta', 'cottage cheese', 'cream cheese', 'spread cheese', 'blue cheese', 'goat cheese',
+                'butter', 'margarine', 'soft margarine', 'dairy butter', 'light margarine',
+                'eggs', 'egg whites', 'mayonnaise', 'aioli', 'remoulade', 'chili mayonnaise'
+            ],
+            'Brød & Bakervarer': [
+                'bread', 'white bread', 'rolls', 'baguette', 'ciabatta', 'focaccia', 'whole grain bread', 'rye bread',
+                'barley bread', 'oat porridge', 'oat bread', 'pita bread', 'tortilla', 'wraps',
+                'bagel', 'croissant', 'bun', 'cinnamon rolls', 'danish pastry', 'custard bun', 'cakes', 'danish',
+                'crispbread', 'rusk', 'grain crackers', 'crackers', 'rice crackers', 'oatmeal', 'muesli', 'breakfast cereal',
+                'cornflakes', 'rolled oats', 'oat pudding', 'almond slices', 'almond flakes', 'chocolate chips', 'chocolate drops'
+            ],
+            'Tørrvarelager & Hermetikk': [
+                'pasta', 'spaghetti', 'macaroni', 'penne', 'fusilli', 'lasagna sheets', 'tortellini', 'ravioli',
+                'rice', 'jasmine rice', 'basmati rice', 'risotto', 'parboiled rice', 'sushi rice',
+                'flour', 'wheat flour', 'whole wheat flour', 'gluten free flour', 'almond flour', 'sifted whole wheat',
+                'sugar', 'powdered sugar', 'icing sugar', 'brown sugar', 'granulated sugar', 'honey', 'syrup', 'agave syrup',
+                'sea salt', 'table salt', 'pepper', 'paprika', 'curry', 'cinnamon', 'nutmeg', 'cloves',
+                'baking powder', 'baking soda', 'vanilla sugar', 'vanilla bean', 'yeast', 'dry yeast', 'cocoa',
+                'canned tomatoes', 'tomato paste', 'ketchup', 'canned corn', 'canned peas',
+                'canned chickpeas', 'canned beans', 'canned tuna', 'canned mackerel', 'canned pineapple',
+                'coconut milk', 'canned coconut milk',
+                'pesto', 'tapenade', 'olive oil', 'canola oil', 'coconut oil', 'butter oil', 'sunflower oil',
+                'vinegar', 'balsamic vinegar', 'red wine vinegar', 'apple cider vinegar', 'soy sauce', 'fish sauce', 'oyster sauce',
+                'bouillon', 'stock', 'chicken stock', 'vegetable stock', 'beef', 'peanut butter', 'hazelnut spread', 'nutella',
+                'jam', 'strawberry jam', 'raspberry jam', 'apricot jam', 'orange marmalade',
+                'granola bars', 'protein bars', 'nuts', 'almonds', 'cashews', 'peanuts', 'hazelnuts',
+                'raisins', 'dried apricots', 'dried cranberries', 'dried fruit'
+            ],
+            'Fryste varer': [
+                'frozen peas', 'frozen vegetables', 'frozen vegetable mix', 'frozen berries', 'frozen strawberries',
+                'frozen blueberries', 'frozen raspberries', 'frozen lingonberries', 'frozen mango', 'frozen berry mix',
+                'pizza', 'grandiosa', 'ready meals', 'lasagna', 'fish gratin', 'hash', 'taco meat',
+                'ice cream', 'ice cream', 'sorbet', 'popsicle', 'ice pop', 'ice cream cones',
+                'french fries', 'potato wedges', 'potato slices', 'croquettes', 'fish fillets', 'fish fingers',
+                'breaded fish', 'frozen pudding'
+            ],
+            'Urter & Krydder': [
+                'salt', 'pepper', 'basil', 'oregano', 'thyme', 'rosemary', 'parsley', 'coriander',
+                'dill', 'chives', 'mint', 'sage', 'tarragon', 'bay leaves', 'curry', 'curry paste',
+                'turmeric', 'cumin', 'coriander seeds', 'chili flakes', 'chipotle', 'cayenne pepper',
+                'paprika powder', 'sweet paprika', 'smoked paprika', 'garlic powder', 'onion powder',
+                'nutmeg', 'cardamom', 'cloves', 'star anise', 'cinnamon', 'vanilla sugar', 'ginger',
+                'sesame seeds', 'poppy seeds', 'sunflower seeds', 'pumpkin seeds', 'chia seeds', 'flax seeds'
+            ],
+            'Drikke': [
+                'water', 'spring water', 'sparkling water', 'mineral water', 'soda', 'cola', 'solo', 'fanta',
+                'sprite', 'pepsi', 'juice concentrate', 'apple juice', 'orange juice', 'juice', 'smoothie',
+                'coffee', 'coffee beans', 'filter coffee', 'espresso', 'tea', 'green tea', 'black tea', 'herbal tea',
+                'cocoa', 'chocolate milk', 'energy drink', 'sports drink', 'protein shake', 'coconut water',
+                'beer', 'pilsner', 'lager', 'non-alcoholic beer', 'non-alcoholic wine', 'light beer'
+            ],
+            'Godteri & Snacks': [
+                'chocolate', 'milk chocolate', 'dark chocolate', 'kvikk lunsj', 'stratos', 'freia milk chocolate',
+                'twist', 'smash', 'non stop', 'center', 'marianne', 'drops', 'mint drops',
+                'candy', 'gummy bears', 'jelly', 'licorice', 'salty licorice', 'sweet licorice', 'lollipop', 'lozenges',
+                'chewing gum', 'popcorn', 'microwave popcorn', 'chips', 'potato chips', 'sørlandschips', 'maarud',
+                'nachos', 'tortilla chips', 'salsa', 'guacamole', 'dip', 'peanuts', 'salted peanuts',
+                'cashews', 'nut mix', 'trail mix', 'trail mix', 'cookies', 'small cookies',
+                'butter cookies', 'digestive', 'ballerina', 'oat cookies'
+            ],
+            'Husholdning & Rengjøring': [
+                'dish soap', 'dishwasher detergent', 'dishwasher tablets', 'dish brush', 'dish cloth',
+                'paper towels', 'cleaning', 'all-purpose cleaner', 'soap', 'soap dispenser', 'toilet paper', 'toilet paper', 'kitchen rolls',
+                'paper towels', 'napkins', 'wet wipes', 'cloths', 'rags', 'sponge', 'scrub sponge',
+                'scouring powder', 'bleach', 'chlorine wipes', 'disinfectant', 'floor cleaner', 'window cleaner', 'glass cleaner',
+                'bathroom cleaner', 'limescale remover', 'universal cleaner', 'oven cleaner', 'stove cleaner',
+                'laundry', 'laundry detergent', 'liquid detergent', 'fabric softener', 'color catcher', 'washing powder',
+                'soap flakes', 'stain remover', 'bleach', 'wool wash',
+                'garbage bags', 'shopping bags', 'freezer bags', 'bread bags', 'aluminum foil', 'plastic wrap', 'baking paper'
+            ],
+            'Vinmonopolet': [
+                'strong beer', 'ipa', 'pale ale', 'stout', 'porter', 'brown ale', 'wheat beer', 'witbier',
+                'wine', 'red wine', 'white wine', 'rosé wine', 'sparkling wine', 'champagne', 'prosecco', 'cava',
+                'cider', 'apple cider', 'pear cider',
+                'spirits', 'vodka', 'whisky', 'gin', 'rum', 'tequila', 'cognac', 'liqueur', 'baileys', 'kahlua',
+                'aperol', 'campari', 'vermouth', 'sherry', 'port wine', 'madeira'
+            ],
+            'Kontorartikler': [
+                'ballpoint pen', 'pencil', 'eraser', 'notepad', 'post-it', 'sticky notes', 'binder', 'sheet protectors',
+                'paper clips', 'binder clips', 'staples', 'stapler', 'hole punch', 'tape', 'tape', 'double sided tape',
+                'calculator', 'scissors', 'office scissors', 'ruler', 'glue', 'glue stick', 'marker', 'marker', 'highlighter',
+                'A4 paper', 'writing paper', 'envelope', 'white envelopes', 'brown envelopes', 'labels',
+                'tags'
+            ],
+            'Elektronikk': [
+                'batteries', 'AA batteries', 'AAA batteries', '9V battery', 'button cells', 'CR2032',
+                'USB cable', 'USB-C cable', 'Lightning cable', 'micro-USB cable', 'USB-A to USB-C',
+                'charging adapter', 'power adapter', 'fast charger', 'USB charger', 'wall charger',
+                'HDMI cable', 'extension cord', 'power cable', 'extension cable', 'power cord',
+                'headphones', 'earphones', 'wireless headphones', 'AirPods', 'earbuds',
+                'power bank', 'battery pack', 'external battery', 'portable charger',
+                'memory card', 'SD card', 'microSD', 'USB flash drive', 'USB stick',
+                'adapter', 'power adapter', 'travel adapter', 'USB adapter',
+                'fuse', 'power outlet', 'socket', 'power strip',
+                'smart bulb', 'LED smart bulb', 'smart speaker', 'remote control',
+                'phone holder', 'car phone holder', 'phone charger', 'wireless charger'
+            ],
+            'Apotek': [
+                'eye drops', 'nasal spray', 'pain reliever', 'paracetamol', 'ibuprofen',
+                'bandage', 'bandages', 'compress', 'gauze',
+                'cream', 'ointment', 'wound cream', 'moisturizer', 'sunscreen',
+                'medicine', 'prescription', 'vitamins', 'cod liver oil', 'supplements',
+                'allergy medicine', 'antihistamine',
+                'cough syrup', 'throat lozenges', 'saline nasal spray',
+                'thermometer', 'blood pressure monitor', 'syringes', 'gloves'
+            ],
+            'Baby': [
+                'diapers', 'diaper change', 'diaper bags', 'changing mat',
+                'wet wipes', 'wet baby wipes', 'dry baby wipes', 'baby washcloths',
+                'baby cream', 'diaper cream', 'zinc cream', 'baby ointment', 'baby bath oil', 'bath oil baby',
+                'baby shampoo', 'shampoo baby', 'baby soap', 'baby soap', 'baby bath',
+                'baby formula', 'milk substitute', 'baby milk', 'weaning food',
+                'baby porridge', 'baby food', 'baby puree', 'fruit puree', 'vegetable puree', 'meat puree',
+                'baby smoothie', 'smoothie baby', 'baby juice', 'baby juice',
+                'pacifier', 'pacifiers', 'dummy', 'baby bottle', 'baby bottle', 'feeding bottle',
+                'bottle brush', 'bottle cleaning', 'pacifier holder', 'pacifier clip',
+                'bib', 'bib', 'baby towel', 'baby bath towel',
+                'baby candle stumps', 'baby cabinet', 'baby lotion', 'baby powder',
+                'baby toothbrush', 'toothbrush baby', 'baby toothpaste', 'baby toothpaste',
+                'baby plate', 'baby spoon', 'baby dining set', 'baby fork', 'sippy cup',
+                'baby carrier', 'baby nest', 'baby blanket', 'baby blanket',
+                'toys', 'teething toys', 'stuffed animals', 'baby books', 'activity toys'
+            ],
+            'Møbelbutikk': [
+                'light bulb', 'LED bulb', 'energy saving bulb', 'halogen bulb', 'E27 bulb', 'E14 bulb', 'GU10 bulb',
+                'houseplants', 'potted plants', 'flower pot', 'plant pot', 'plant pot', 'cactus',
+                'cushion', 'sofa cushion', 'decorative pillow', 'pillow insert', 'throw blanket', 'wool blanket', 'fleece blanket',
+                'curtain', 'blinds', 'roller blind', 'curtain hooks', 'curtain rings', 'curtain rod',
+                'picture frame', 'photo frame', 'wall decor', 'mirror', 'wall mirror',
+                'candle', 'lit candles', 'scented candle', 'tea lights', 'pillar candle', 'taper candle', 'lighter', 'matches',
+                'basket', 'storage basket', 'woven basket', 'vase', 'glass vase', 'ceramic vase',
+                'mat', 'rug', 'doormat', 'bath mat', 'rug pad'
+            ],
+            'Skredder': [
+                'thread', 'sewing thread', 'cotton thread', 'polyester thread', 'needle', 'sewing needle', 'hand needle', 'machine needle',
+                'button', 'buttons', 'snap button', 'zipper', 'zipper', 'scissors', 'fabric scissors', 'thread scissors',
+                'measuring tape', 'sewing tape', 'darning thread', 'wool thread', 'yarn', 'knitting supplies', 'knitting yarn',
+                'knitting needles', 'circular needles', 'crochet hook', 'safety pin', 'safety pin', 'seam ripper',
+                'fabric', 'cotton fabric', 'jersey', 'fleece', 'felt'
+            ],
+            'Bensinstasjon': [
+                'gasoline', '95 octane', '98 octane', 'diesel', 'biodiesel', 'windshield washer fluid', 'windshield washer fluid',
+                'motor oil', 'car care', 'car shampoo', 'ice scraper', 'ice scraper', 'de-icer spray', 'newspapers',
+                'car air freshener', 'car perfume', 'car scent', 'cleaning cloth', 'car cloth', 'microfiber cloth',
+                'coffee', 'hot dog', 'sausage', 'hot food', 'nachos', 'energy drink', 'red bull', 'battery',
+                'lighters', 'ice cubes', 'energy bar', 'coolant', 'brake fluid', 'jumper cables'
+            ],
+            'Post': [
+                'package', 'package with pickup code', 'pick up package', 'post', 'post office',
+                'letter', 'postcard', 'stamp', 'stamps', 'A-mail stamp', 'B-mail stamp', 'postage', 'postage rate',
+                'parcel post', 'letter mail', 'registered mail', 'return mail',
+                'envelope', 'C5 envelope', 'C4 envelope', 'bubble envelope', 'padded envelope',
+                'packing tape', 'brown tape', 'packaging tape', 'wrapping paper', 'bubble wrap',
+                'box', 'cardboard box', 'cardboard box', 'package label', 'address label', 'address tag',
+                'customs form', 'customs declaration', 'CN23', 'sender label', 'return label',
+                'pencil', 'postal scale', 'plastic bag', 'mailing bag', 'mail sack'
+            ],
+            'Diverse': [
+                'wrapping paper', 'gift bag', 'ribbon', 'bow', 'gift tag', 'card', 'birthday card',
+                'congratulations card', 'thank you card', 'invitation', 'envelope', 'balloons', 'napkins',
+                'party napkins', 'paper plates', 'paper plates', 'plastic cups', 'paper cups', 'straws',
+                'party decorations', 'garland', 'banner', 'confetti', 'candles', 'tea lights', 'party candles', 'cake decorations'
+            ]
+        };
+
+        let shoppingList = [];
+        let customItems = {};
+        let learnedVariants = {};
+        let lastAddedItemId = null;
+        let lastAddedCategory = null;
+        let selectedAutocompleteIndex = -1;
+        let currentAutocompleteMatches = [];
+        let currentEditingItemId = null;
+
+        // Firebase caching
+        let globalItemsCache = null;
+        let globalCategoriesCache = null;
+        let sharedListUnsubscribe = null;
+
+        const FILLER_WORDS = [
+            'kan', 'du', 'handle', 'kjøpe', 'hente', 'få', 'tak', 'i', 'trenger', 'må', 'ha',
+            'litt', 'noe', 'noen', 'en', 'et', 'ei', 'og', 'eller', 'også', 'takk', 'tusen', 'vennligst',
+            'gjerne', 'kanskje', 'om', 'mulig', 'hvis', 'dersom', 'når', 'hei', 'hallo', 'hey',
+            'ja', 'ah', 'åh', 'oh', 'nei', 'ok', 'okay'
+        ];
+
+        const ADJECTIVES = [
+            'økologisk', 'økologiske', 'fersk', 'ferske', 'frossen', 'frosne', 'fryste', 'fryst',
+            'hermetisk', 'hermetiske', 'lett', 'lette', 'ekstra', 'hel', 'hele', 'helle',
+            'skåret', 'skårne', 'hakket', 'hakkede', 'rød', 'røde', 'grønn', 'grønne',
+            'gul', 'gule', 'hvit', 'hvite', 'blå', 'norsk', 'norske', 'italiensk', 'italienske',
+            'stor', 'store', 'liten', 'små', 'lang', 'lange', 'kort', 'korte', 'fin', 'fine',
+            'god', 'gode', 'beste', 'billig', 'billige', 'dyr', 'dyre', 'ny', 'nye', 'gammel', 'gamle'
+        ];
+
+        const IMPORTANT_ADJECTIVES = [
+            'laktosefri', 'laktosefritt', 'laktosefrie',
+            'glutenfri', 'glutenfritt', 'glutenfrie',
+            'vegansk', 'veganske',
+            'vegetar', 'vegetarisk', 'vegetariske',
+            'sukkerfri', 'sukkerfritt', 'sukkerfrie',
+            'økologisk', 'økologiske', 'øko'
+        ];
+
+        async function initializeApp() {
+            loadFromStorage();
+
+            // Wait for authentication to complete
+            try {
+                await auth.signInAnonymously();
+                console.log('Authenticated as:', auth.currentUser.uid);
+            } catch (err) {
+                console.error('Auth error:', err);
+            }
+
+            // DEAKTIVERT MIDLERTIDIG: Quota exceeded
+            // await seedFirestore();
+            // await migratePaalegg();
+            // await migrateElektronikk();
+            // await migrateNewCategories();
+            // await removeDuplicateCategories();
+            // await removeDuplicateItems();
+
+            // Set loading state on search input
+            const searchInput = document.getElementById('searchInput');
+            searchInput.classList.add('loading');
+            searchInput.placeholder = '⏳ Laster varedatabase...';
+
+            // Load global cache from Firestore (don't wait - run in background)
+            loadGlobalCache().then(() => {
+                console.log('✅ Varedatabase lastet fra Firestore');
+                // Remove loading state and restore normal placeholder
+                searchInput.classList.remove('loading');
+                const currentLang = localStorage.getItem('language') || 'no';
+                searchInput.placeholder = currentLang === 'no'
+                    ? 'Lim inn kaos eller enkeltvarer her'
+                    : 'Paste chaos or individual items here';
+            }).catch(err => {
+                console.error('⚠️ Kunne ikke laste varedatabase:', err);
+                // Still remove loading state even on error
+                searchInput.classList.remove('loading');
+                searchInput.placeholder = 'Lim inn kaos eller enkeltvarer her';
+            });
+
+            // Cleanup old shared lists (7+ days)
+            cleanupOldLists().catch(err => console.error('Cleanup error:', err));
+
+            // Check for ?join= URL parameter
+            await checkUrlJoin();
+
+            // Setup shared list listener if active
+            const activeListId = localStorage.getItem('activeListId');
+            if (activeListId) {
+                setupSharedListListener(activeListId);
+            }
+
+            document.getElementById('lang-no').classList.toggle('active', currentLanguage === 'no');
+            document.getElementById('lang-en').classList.toggle('active', currentLanguage === 'en');
+
+            // Initialize view mode
+            updateUI();
+            updateSharedListHeader();
+            renderList();
+            setupSearchListeners();
+            setupBadgeListeners();
+        }
+
+        async function seedFirestore() {
+            if (localStorage.getItem('firestore_seeded')) return;
+
+            console.log('Seeding Firestore...');
+            const batch = db.batch();
+
+            // Seed categories
+            CATEGORIES.forEach((catName, index) => {
+                const catRef = db.collection('globalCategories').doc();
+                batch.set(catRef, {
+                    name_no: catName,
+                    name_en: TRANSLATIONS.en.categories[catName] || catName,
+                    emoji: TRANSLATIONS.no.categories[catName]?.split(' ')[0] || '📦',
+                    order: index,
+                    approved: true,
+                    createdBy: 'system',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedBy: 'system'
+                });
+            });
+
+            // Seed items from DATABASE
+            Object.entries(DATABASE).forEach(([category, items]) => {
+                items.forEach(itemName => {
+                    const itemRef = db.collection('globalItems').doc();
+                    const enName = DATABASE_EN[category]?.find((en, idx) =>
+                        DATABASE[category].indexOf(itemName) === idx
+                    );
+
+                    batch.set(itemRef, {
+                        name_no: itemName,
+                        name_en: enName || itemName,
+                        category: category,
+                        approved: true,
+                        createdBy: 'system',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        approvedBy: 'system',
+                        usageCount: 0
+                    });
+                });
+            });
+
+            await batch.commit();
+            localStorage.setItem('firestore_seeded', 'true');
+            console.log('Firestore seeding complete!');
+        }
+
+        async function migratePaalegg() {
+            if (localStorage.getItem('firestore_paalegg_migrated')) return;
+
+            console.log('Migrating Pålegg category to Firestore...');
+            const batch = db.batch();
+
+            // Add Pålegg category
+            const catRef = db.collection('globalCategories').doc();
+            batch.set(catRef, {
+                name_no: 'Pålegg',
+                name_en: 'Deli & Spreads',
+                emoji: '🧈',
+                order: 2, // After Kjøtt & Fisk
+                approved: true,
+                createdBy: 'system',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: 'system'
+            });
+
+            // Add Pålegg items
+            const paaleggItems = DATABASE['Pålegg'] || [];
+            const paaleggItemsEN = DATABASE_EN['Pålegg'] || [];
+
+            paaleggItems.forEach((itemName, idx) => {
+                const itemRef = db.collection('globalItems').doc();
+                const enName = paaleggItemsEN[idx] || itemName;
+
+                batch.set(itemRef, {
+                    name_no: itemName,
+                    name_en: enName,
+                    category: 'Pålegg',
+                    approved: true,
+                    createdBy: 'system',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedBy: 'system',
+                    usageCount: 0
+                });
+            });
+
+            await batch.commit();
+            localStorage.setItem('firestore_paalegg_migrated', 'true');
+
+            // Clear cache to force reload
+            localStorage.removeItem('globalCacheTime');
+            localStorage.removeItem('globalItemsCache');
+            localStorage.removeItem('globalCategoriesCache');
+
+            console.log('Pålegg migration complete! Cache cleared.');
+        }
+
+        async function migrateElektronikk() {
+            if (localStorage.getItem('firestore_elektronikk_migrated')) return;
+
+            console.log('Migrating Elektronikk category to Firestore...');
+            const batch = db.batch();
+
+            // Add Elektronikk category
+            const catRef = db.collection('globalCategories').doc();
+            batch.set(catRef, {
+                name_no: 'Elektronikk',
+                name_en: 'Electronics',
+                emoji: '🔌',
+                order: 11, // After Kontorartikler
+                approved: true,
+                createdBy: 'system',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: 'system'
+            });
+
+            // Add Elektronikk items
+            const elektrItems = DATABASE['Elektronikk'] || [];
+            const elektrItemsEN = DATABASE_EN['Elektronikk'] || [];
+
+            elektrItems.forEach((itemName, idx) => {
+                const itemRef = db.collection('globalItems').doc();
+                const enName = elektrItemsEN[idx] || itemName;
+
+                batch.set(itemRef, {
+                    name_no: itemName,
+                    name_en: enName,
+                    category: 'Elektronikk',
+                    approved: true,
+                    createdBy: 'system',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    approvedBy: 'system',
+                    usageCount: 0
+                });
+            });
+
+            await batch.commit();
+            localStorage.setItem('firestore_elektronikk_migrated', 'true');
+
+            // Clear cache to force reload
+            localStorage.removeItem('globalCacheTime');
+            localStorage.removeItem('globalItemsCache');
+            localStorage.removeItem('globalCategoriesCache');
+
+            console.log('Elektronikk migration complete! Cache cleared.');
+        }
+
+        async function migrateNewCategories() {
+            if (localStorage.getItem('firestore_new_categories_migrated')) return;
+
+            console.log('Migrating new categories to Firestore...');
+            const batch = db.batch();
+
+            const newCategories = [
+                { name_no: 'Laktosefri/Glutenfri', name_en: 'Lactose/Gluten-Free', emoji: '🥛', order: 0 },
+                { name_no: 'Apotek', name_en: 'Pharmacy', emoji: '💊', order: 15 }
+            ];
+
+            for (const cat of newCategories) {
+                // Check if category already exists
+                const existingCat = await db.collection('globalCategories')
+                    .where('name_no', '==', cat.name_no)
+                    .where('approved', '==', true)
+                    .limit(1)
+                    .get();
+
+                if (existingCat.empty) {
+                    const catRef = db.collection('globalCategories').doc();
+                    batch.set(catRef, {
+                        name_no: cat.name_no,
+                        name_en: cat.name_en,
+                        emoji: cat.emoji,
+                        order: cat.order,
+                        approved: true,
+                        createdBy: 'system',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        approvedBy: 'system'
+                    });
+
+                    // Add items for this category
+                    const categoryItems = DATABASE[cat.name_no] || [];
+                    const categoryItemsEN = DATABASE_EN[cat.name_no] || [];
+
+                    categoryItems.forEach((itemName, idx) => {
+                        const itemRef = db.collection('globalItems').doc();
+                        const enName = categoryItemsEN[idx] || itemName;
+
+                        batch.set(itemRef, {
+                            name_no: itemName,
+                            name_en: enName,
+                            category: cat.name_no,
+                            approved: true,
+                            createdBy: 'system',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            approvedBy: 'system',
+                            usageCount: 0
+                        });
+                    });
+                }
+            }
+
+            await batch.commit();
+            localStorage.setItem('firestore_new_categories_migrated', 'true');
+
+            // Clear cache to force reload
+            localStorage.removeItem('globalCacheTime');
+            localStorage.removeItem('globalItemsCache');
+            localStorage.removeItem('globalCategoriesCache');
+
+            console.log('New categories migration complete! Cache cleared.');
+        }
+
+        async function removeDuplicateItems() {
+            if (localStorage.getItem('firestore_duplicates_removed')) return;
+
+            console.log('Removing duplicate items from Firestore...');
+
+            const itemsSnapshot = await db.collection('globalItems').get();
+            const seen = new Map(); // key: "name_no|category", value: first doc ID
+            const duplicatesToDelete = [];
+
+            itemsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const key = `${data.name_no}|${data.category}`;
+
+                if (seen.has(key)) {
+                    // This is a duplicate, mark for deletion
+                    duplicatesToDelete.push(doc.id);
+                } else {
+                    // First occurrence, keep it
+                    seen.set(key, doc.id);
+                }
+            });
+
+            if (duplicatesToDelete.length > 0) {
+                console.log(`Found ${duplicatesToDelete.length} duplicate items, deleting...`);
+                const batch = db.batch();
+                duplicatesToDelete.forEach(docId => {
+                    batch.delete(db.collection('globalItems').doc(docId));
+                });
+                await batch.commit();
+                console.log('Duplicates removed!');
+
+                // Clear cache to force reload
+                localStorage.removeItem('globalCacheTime');
+                localStorage.removeItem('globalItemsCache');
+                localStorage.removeItem('globalCategoriesCache');
+            } else {
+                console.log('No duplicates found.');
+            }
+
+            localStorage.setItem('firestore_duplicates_removed', 'true');
+        }
+
+        async function removeDuplicateCategories() {
+            if (localStorage.getItem('firestore_duplicate_categories_removed')) return;
+
+            console.log('Removing duplicate categories from Firestore...');
+
+            const categoriesSnapshot = await db.collection('globalCategories')
+                .where('approved', '==', true)
+                .get();
+
+            const seen = new Map(); // key: "name_no", value: {docId, order, createdAt}
+            const duplicatesToDelete = [];
+
+            categoriesSnapshot.forEach(doc => {
+                const data = doc.data();
+                const key = data.name_no;
+
+                if (seen.has(key)) {
+                    // Duplicate found - keep the one with lower order number
+                    const existing = seen.get(key);
+                    const existingOrder = existing.order || 999;
+                    const currentOrder = data.order || 999;
+
+                    if (currentOrder < existingOrder) {
+                        // Current has lower order, delete the existing one
+                        duplicatesToDelete.push(existing.docId);
+                        seen.set(key, { docId: doc.id, order: currentOrder, createdAt: data.createdAt });
+                    } else {
+                        // Existing has lower order, delete current
+                        duplicatesToDelete.push(doc.id);
+                    }
+                } else {
+                    // First occurrence, keep it
+                    seen.set(key, { docId: doc.id, order: data.order || 999, createdAt: data.createdAt });
+                }
+            });
+
+            if (duplicatesToDelete.length > 0) {
+                console.log(`Found ${duplicatesToDelete.length} duplicate categories, deleting...`);
+                const batch = db.batch();
+                duplicatesToDelete.forEach(docId => {
+                    batch.delete(db.collection('globalCategories').doc(docId));
+                });
+                await batch.commit();
+                console.log('Duplicate categories removed!');
+
+                // Clear cache to force reload
+                localStorage.removeItem('globalCacheTime');
+                localStorage.removeItem('globalItemsCache');
+                localStorage.removeItem('globalCategoriesCache');
+            } else {
+                console.log('No duplicate categories found.');
+            }
+
+            localStorage.setItem('firestore_duplicate_categories_removed', 'true');
+        }
+
+        async function loadGlobalCache() {
+            const cacheTime = localStorage.getItem('globalCacheTime');
+            const now = Date.now();
+
+            if (cacheTime && (now - parseInt(cacheTime) < 24 * 60 * 60 * 1000)) {
+                globalItemsCache = JSON.parse(localStorage.getItem('globalItemsCache'));
+                globalCategoriesCache = JSON.parse(localStorage.getItem('globalCategoriesCache'));
+                console.log('✅ Lastet varedatabase fra cache');
+                return;
+            }
+
+            console.log('⏳ Laster varedatabase fra Firestore...');
+            const startTime = Date.now();
+
+            // Load approved items
+            const itemsSnapshot = await db.collection('globalItems')
+                .where('approved', '==', true)
+                .get();
+
+            globalItemsCache = {};
+            itemsSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (!globalItemsCache[data.category]) {
+                    globalItemsCache[data.category] = [];
+                }
+                globalItemsCache[data.category].push({
+                    no: data.name_no,
+                    en: data.name_en
+                });
+            });
+
+            // Load approved categories
+            const catsSnapshot = await db.collection('globalCategories')
+                .where('approved', '==', true)
+                .orderBy('order')
+                .get();
+
+            globalCategoriesCache = [];
+            catsSnapshot.forEach(doc => {
+                globalCategoriesCache.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+
+            localStorage.setItem('globalItemsCache', JSON.stringify(globalItemsCache));
+            localStorage.setItem('globalCategoriesCache', JSON.stringify(globalCategoriesCache));
+            localStorage.setItem('globalCacheTime', now.toString());
+
+            const loadTime = ((Date.now() - startTime) / 1000).toFixed(1);
+            console.log(`✅ Varedatabase lastet på ${loadTime}s (${itemsSnapshot.size} varer)`);
+
+            // Show subtle notification
+            showToast(`Varedatabase oppdatert (${itemsSnapshot.size} varer)`);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                opacity: 0;
+                transition: opacity 0.3s;
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.style.opacity = '1', 10);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+
+            // Update burger menu items
+            const burgerNo = document.getElementById('burger-lang-no');
+            const burgerEn = document.getElementById('burger-lang-en');
+
+            if (lang === 'no') {
+                burgerNo.style.background = 'rgba(0, 0, 0, 0.05)';
+                burgerNo.style.fontWeight = '600';
+                burgerEn.style.background = '';
+                burgerEn.style.fontWeight = '';
+            } else {
+                burgerEn.style.background = 'rgba(0, 0, 0, 0.05)';
+                burgerEn.style.fontWeight = '600';
+                burgerNo.style.background = '';
+                burgerNo.style.fontWeight = '';
+            }
+
+            updateUI();
+            renderList();
+        }
+
+        function t(key) {
+            const keys = key.split('.');
+            let value = TRANSLATIONS[currentLanguage];
+            for (const k of keys) {
+                value = value[k];
+            }
+            return value || key;
+        }
+
+        function updateUI() {
+            document.getElementById('app-title').textContent = t('appTitle');
+            document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+            document.getElementById('adhd-text').innerHTML = t('adhdExplanation');
+
+            const addAllBtn = document.getElementById('addAllBtn');
+            if (addAllBtn) addAllBtn.textContent = t('addAllBtn');
+
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) cancelBtn.textContent = t('cancelBtn');
+
+            document.getElementById('shareModalTitle').textContent = t('shareModalTitle');
+            document.getElementById('shareCodeLabel').textContent = t('shareCodeLabel');
+            document.getElementById('copyCodeBtn').textContent = t('copyCodeBtn');
+            document.getElementById('importModalTitle').textContent = t('importModalTitle');
+            document.getElementById('importCodeLabel').textContent = t('importCodeLabel');
+            document.getElementById('importCode').placeholder = t('importCodePlaceholder');
+
+            // Update footer
+            const footerCredit = document.getElementById('footer-credit');
+            if (footerCredit) {
+                footerCredit.innerHTML = t('footerCredit') + ' - <a href="mailto:hei@hallvar.no" style="color: var(--primary); text-decoration: none;">hei@hallvar.no</a>';
+            }
+
+            const privacyNotice = document.getElementById('privacy-notice');
+            if (privacyNotice) {
+                privacyNotice.textContent = t('privacyNotice');
+            }
+
+            const participantsLabel = document.getElementById('participants-label');
+            if (participantsLabel) {
+                participantsLabel.textContent = t('participants');
+            }
+
+            const burgerAbout = document.getElementById('burger-about');
+            if (burgerAbout) {
+                burgerAbout.textContent = t('about');
+            }
+
+            const aboutModalTitle = document.getElementById('aboutModalTitle');
+            if (aboutModalTitle) {
+                aboutModalTitle.textContent = t('aboutModalTitle');
+            }
+
+            const aboutModalCredit = document.getElementById('aboutModalCredit');
+            if (aboutModalCredit) {
+                aboutModalCredit.textContent = t('aboutModalCredit');
+            }
+
+            const aboutModalPrivacy = document.getElementById('aboutModalPrivacy');
+            if (aboutModalPrivacy) {
+                aboutModalPrivacy.textContent = t('aboutModalPrivacy');
+            }
+
+            // Enable/disable buttons based on list content
+            const activeListId = localStorage.getItem('activeListId');
+            const userNickname = localStorage.getItem('userNickname');
+            const hasItems = shoppingList.length > 0;
+
+            const shareBtn = document.getElementById('shareBtn');
+            const clearBtn = document.getElementById('clearBtn');
+
+            // Del-knapp: style endres, men alltid klikkbar (sjekk i funksjonen)
+            if (shareBtn) {
+                // IKKE bruk disabled - det blokkerer onclick på mobil
+                shareBtn.setAttribute('data-has-items', hasItems ? 'true' : 'false');
+                shareBtn.style.opacity = hasItems ? '1' : '0.5';
+                shareBtn.style.cursor = hasItems ? 'pointer' : 'not-allowed';
+
+                // Update color based on sharing status (for Listesjef)
+                if (activeListId && userNickname === 'Listesjef') {
+                    updateShareButtonColor(activeListId, shareBtn);
+                } else {
+                    // Reset to default color
+                    shareBtn.style.background = '';
+                }
+            }
+
+            // Tøm-knapp: aktiv kun hvis det er varer OG (ikke delt ELLER er listesjef)
+            if (clearBtn) {
+                const canClear = hasItems && (!activeListId || userNickname === 'Listesjef');
+                // IKKE bruk disabled - det blokkerer onclick på mobil
+                clearBtn.setAttribute('data-can-clear', canClear ? 'true' : 'false');
+                clearBtn.style.opacity = canClear ? '1' : '0.4';
+                clearBtn.style.cursor = canClear ? 'pointer' : 'not-allowed';
+            }
+        }
+
+        function setupSearchListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const autocomplete = document.getElementById('autocomplete');
+
+            // Auto-resize textarea
+            searchInput.addEventListener('input', (e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+
+                const text = e.target.value;
+                const isBulkInput = detectBulkInput(text);
+
+                if (isBulkInput) {
+                    autocomplete.style.display = 'none';
+                    handleBulkInput(text);
+                } else {
+                    document.querySelector('.controls').style.display = 'none';
+                    document.getElementById('previewSection').style.display = 'none';
+                    const query = text.trim();
+                    if (query.length > 0) {
+                        showAutocomplete(query);
+                    } else {
+                        autocomplete.style.display = 'none';
+                    }
+                }
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                const autocomplete = document.getElementById('autocomplete');
+                const isAutocompleteVisible = autocomplete.style.display === 'block';
+
+                if (e.key === 'ArrowDown' && isAutocompleteVisible) {
+                    e.preventDefault();
+                    selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, currentAutocompleteMatches.length - 1);
+                    updateAutocompleteSelection();
+                } else if (e.key === 'ArrowUp' && isAutocompleteVisible) {
+                    e.preventDefault();
+                    selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+                    updateAutocompleteSelection();
+                } else if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const text = e.target.value.trim();
+
+                    if (detectBulkInput(text)) {
+                        return;
+                    }
+
+                    if (isAutocompleteVisible && selectedAutocompleteIndex >= 0) {
+                        const selected = currentAutocompleteMatches[selectedAutocompleteIndex];
+                        selectAutocomplete(selected.item, selected.category);
+                    } else if (text) {
+                        addItem(text);
+                        e.target.value = '';
+                        e.target.style.height = 'auto';
+                        autocomplete.style.display = 'none';
+                    }
+                    selectedAutocompleteIndex = -1;
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !autocomplete.contains(e.target)) {
+                    autocomplete.style.display = 'none';
+                }
+            });
+        }
+
+        function setupBadgeListeners() {
+            // Badge removed - function kept for compatibility
+        }
+
+        function detectBulkInput(text) {
+            const lines = text.split('\n').filter(l => l.trim().length > 0);
+            const hasMultipleLines = lines.length > 1;
+            const hasMultipleCommas = (text.match(/,/g) || []).length >= 2;
+            return hasMultipleLines || hasMultipleCommas;
+        }
+
+        let currentParsedItems = [];
+
+        function handleBulkInput(text) {
+            const items = parseText(text);
+            currentParsedItems = [];
+            const recognized = [];
+            const unrecognized = [];
+
+            items.forEach(item => {
+                const normalized = normalizeText(item);
+
+                if (learnedVariants[normalized]) {
+                    recognized.push({ text: item, category: learnedVariants[normalized].category });
+                    currentParsedItems.push({ text: item, category: learnedVariants[normalized].category });
+                } else {
+                    const match = findBestMatch(normalized);
+                    if (match) {
+                        recognized.push({ text: item, category: match.category });
+                        currentParsedItems.push({ text: item, category: match.category });
+                        learnedVariants[normalized] = { original: match.item, category: match.category };
+                    } else {
+                        unrecognized.push(item);
+                        currentParsedItems.push({ text: item, category: null });
+                    }
+                }
+            });
+
+            displayInlinePreview(recognized, unrecognized);
+        }
+
+        function displayInlinePreview(recognized, unrecognized) {
+            const previewSection = document.getElementById('previewSection');
+            const recognizedItems = document.getElementById('inlineRecognizedItems');
+            const recognizedCount = document.getElementById('inlineRecognizedCount');
+            const unrecognizedContainer = document.getElementById('inlineUnrecognizedContainer');
+            const unrecognizedItems = document.getElementById('inlineUnrecognizedItems');
+
+            document.querySelector('#previewSection .preview-header').innerHTML = `${t('recognizedItems')} (<span id="inlineRecognizedCount">${recognized.length}</span>):`;
+
+            recognizedItems.innerHTML = recognized.map(item => `
+                <div class="preview-item">
+                    <span class="preview-item-text">${item.text}</span>
+                    <span class="preview-item-category">→ ${t('categories.' + item.category)}</span>
+                </div>
+            `).join('') || `<p style="color: #86868b;">${currentLanguage === 'no' ? 'Ingen gjenkjente varer' : 'No recognized items'}</p>`;
+
+            if (unrecognized.length > 0) {
+                unrecognizedContainer.style.display = 'block';
+                document.querySelector('#inlineUnrecognizedContainer .preview-header').textContent = t('unknownItems') + ':';
+                unrecognizedItems.innerHTML = unrecognized.map((item, index) => `
+                    <div class="unrecognized-item">
+                        <input type="text" value="${item}" readonly>
+                        <select id="inline-category-${index}">
+                            <option value="">${t('selectCategory')}</option>
+                            ${CATEGORIES.map(cat => `<option value="${cat}">${t('categories.' + cat)}</option>`).join('')}
+                        </select>
+                    </div>
+                `).join('');
+            } else {
+                unrecognizedContainer.style.display = 'none';
+            }
+
+            document.querySelector('.controls').style.display = 'block';
+            previewSection.style.display = 'block';
+        }
+
+        function addParsedItems() {
+            const unrecognizedSelects = document.querySelectorAll('[id^="inline-category-"]');
+            let allCategoriesSelected = true;
+
+            unrecognizedSelects.forEach((select, index) => {
+                const category = select.value;
+                if (!category) {
+                    allCategoriesSelected = false;
+                } else {
+                    const itemIndex = currentParsedItems.findIndex(item => item.category === null);
+                    if (itemIndex !== -1) {
+                        currentParsedItems[itemIndex].category = category;
+                        const itemText = currentParsedItems[itemIndex].text;
+                        customItems[itemText] = category;
+                        learnedVariants[normalizeText(itemText)] = { original: itemText, category };
+                    }
+                }
+            });
+
+            if (!allCategoriesSelected) {
+                alert(t('alertSelectCategory'));
+                return;
+            }
+
+            currentParsedItems.forEach(item => {
+                if (item.category) {
+                    addItemToList(item.text, item.category);
+                }
+            });
+
+            saveToStorage();
+            cancelBulkInput();
+        }
+
+        function cancelBulkInput() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').style.height = 'auto';
+            document.querySelector('.controls').style.display = 'none';
+            document.getElementById('previewSection').style.display = 'none';
+            currentParsedItems = [];
+        }
+
+        function showAutocomplete(query) {
+            const autocomplete = document.getElementById('autocomplete');
+            if (!autocomplete) return;
+
+            const matches = findMatches(query);
+            currentAutocompleteMatches = matches.slice(0, 8);
+            selectedAutocompleteIndex = -1;
+
+            if (currentAutocompleteMatches.length === 0) {
+                autocomplete.style.display = 'none';
+                return;
+            }
+
+            autocomplete.innerHTML = '';
+            currentAutocompleteMatches.forEach((match, index) => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.dataset.index = index;
+                div.innerHTML = `
+                    <span>${match.item}</span>
+                    <span class="autocomplete-category">${match.category}</span>
+                `;
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectAutocomplete(match.item, match.category);
+                });
+                autocomplete.appendChild(div);
+            });
+
+            autocomplete.style.display = 'block';
+        }
+
+        function updateAutocompleteSelection() {
+            const items = document.querySelectorAll('.autocomplete-item');
+            items.forEach((item, index) => {
+                if (index === selectedAutocompleteIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        function findMatches(query) {
+            const normalizedQuery = normalizeText(query).toLowerCase();
+            const matches = [];
+
+            // Use globalItemsCache if available, else fallback to DATABASE
+            if (globalItemsCache && Object.keys(globalItemsCache).length > 0) {
+                const lang = currentLanguage === 'en' ? 'en' : 'no';
+                for (const [category, items] of Object.entries(globalItemsCache)) {
+                    for (const itemData of items) {
+                        const itemName = itemData[lang];
+                        if (normalizeText(itemName).toLowerCase().includes(normalizedQuery)) {
+                            matches.push({
+                                item: itemName,
+                                category,
+                                usageCount: itemData.usageCount || 0
+                            });
+                        }
+                    }
+                }
+            } else {
+                const db = currentLanguage === 'en' ? DATABASE_EN : DATABASE;
+                for (const [category, items] of Object.entries(db)) {
+                    for (const item of items) {
+                        if (normalizeText(item).toLowerCase().includes(normalizedQuery)) {
+                            matches.push({ item, category, usageCount: 0 });
+                        }
+                    }
+                }
+            }
+
+            for (const [item, category] of Object.entries(customItems)) {
+                if (normalizeText(item).toLowerCase().includes(normalizedQuery)) {
+                    matches.push({ item, category, usageCount: 0 });
+                }
+            }
+
+            for (const [variant, data] of Object.entries(learnedVariants)) {
+                if (normalizeText(variant).toLowerCase().includes(normalizedQuery)) {
+                    matches.push({ item: variant, category: data.category, usageCount: 0 });
+                }
+            }
+
+            // Remove duplicates based on item + category combination
+            const seen = new Set();
+            const uniqueMatches = matches.filter(match => {
+                const key = `${match.item.toLowerCase()}|${match.category}`;
+                if (seen.has(key)) {
+                    return false;
+                }
+                seen.add(key);
+                return true;
+            });
+
+            // Sort by usage count (most used first)
+            uniqueMatches.sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0));
+
+            return uniqueMatches;
+        }
+
+        function selectAutocomplete(item, category) {
+            addItemToList(item, category);
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchInput').style.height = 'auto';
+            document.getElementById('autocomplete').style.display = 'none';
+            selectedAutocompleteIndex = -1;
+            currentAutocompleteMatches = [];
+        }
+
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .replace(/[^a-zæøå0-9\s]/gi, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function addItem(userInput) {
+            const normalized = normalizeText(userInput);
+
+            // Check if we've learned this exact variant before
+            if (learnedVariants[normalized]) {
+                addItemToList(userInput, learnedVariants[normalized].category);
+                return;
+            }
+
+            const match = findBestMatch(normalized);
+
+            if (match) {
+                // Check if it's an EXACT match
+                const normalizedMatch = normalizeText(match.item);
+                const isExactMatch = normalizedMatch === normalized;
+
+                if (isExactMatch) {
+                    // Exact match - add directly without approval
+                    addItemToList(userInput, match.category);
+                    learnedVariants[normalized] = { original: match.item, category: match.category };
+                    saveToStorage();
+                } else {
+                    // NOT exact match - must get approval
+                    // Add to list with suggested category, but send for approval
+                    addItemToList(userInput, match.category);
+
+                    // Send to admin for approval (don't save to learnedVariants yet)
+                    submitItemForApproval(userInput, match.category);
+                }
+            } else {
+                // No match at all - ask for category
+                askUserForCategory(userInput);
+            }
+        }
+
+        function findBestMatch(normalized) {
+            const words = normalized.split(' ').filter(w => !FILLER_WORDS.includes(w));
+            const cleanedWords = words.filter(w => {
+                if (IMPORTANT_ADJECTIVES.includes(w)) return true;
+                return !ADJECTIVES.includes(w) && !/^\d+$/.test(w) && !/^\d+[a-z]+$/.test(w);
+            });
+            const searchTerms = cleanedWords.length > 0 ? cleanedWords : words;
+
+            // Prioritize Laktosefri/Glutenfri category if item contains these words
+            const hasSpecialDiet = normalized.includes('laktosefri') || normalized.includes('laktosefritt') || normalized.includes('laktosefrie') ||
+                                   normalized.includes('glutenfri') || normalized.includes('glutenfritt') || normalized.includes('glutenfrie') ||
+                                   normalized.includes('lactose free') || normalized.includes('gluten free') ||
+                                   normalized.includes('vegansk') || normalized.includes('veganske');
+
+            // Use globalItemsCache if available, else fallback to DATABASE
+            const lang = currentLanguage === 'en' ? 'en' : 'no';
+            const itemsSource = globalItemsCache || (currentLanguage === 'en' ? DATABASE_EN : DATABASE);
+            const useCache = !!globalItemsCache;
+
+            // If item has special diet keywords, search Laktosefri/Glutenfri first
+            if (hasSpecialDiet) {
+                const specialCategory = 'Laktosefri/Glutenfri';
+                if (useCache && itemsSource[specialCategory]) {
+                    for (const itemData of itemsSource[specialCategory]) {
+                        const itemName = itemData[lang];
+                        const normalizedItem = normalizeText(itemName);
+                        for (const term of searchTerms) {
+                            if (normalizedItem === term || normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                                return { item: itemName, category: specialCategory };
+                            }
+                        }
+                    }
+                } else if (!useCache && itemsSource[specialCategory]) {
+                    for (const item of itemsSource[specialCategory]) {
+                        const normalizedItem = normalizeText(item);
+                        for (const term of searchTerms) {
+                            if (normalizedItem === term || normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                                return { item, category: specialCategory };
+                            }
+                        }
+                    }
+                }
+            }
+
+            // FIRST: Try combining search terms (e.g., "olje oliven" → "olivenolje")
+            if (searchTerms.length >= 2) {
+                const combined = searchTerms.join('');
+                const combinedReverse = searchTerms.reverse().join('');
+                searchTerms.reverse(); // Restore original order
+
+                const combinedTerms = [combined, combinedReverse];
+
+                for (const combinedTerm of combinedTerms) {
+                    if (useCache) {
+                        for (const [category, items] of Object.entries(itemsSource)) {
+                            for (const itemData of items) {
+                                const itemName = itemData[lang];
+                                const normalizedItem = normalizeText(itemName);
+                                if (normalizedItem === combinedTerm || normalizedItem.includes(combinedTerm)) {
+                                    return { item: itemName, category };
+                                }
+                            }
+                        }
+                    } else {
+                        for (const [category, items] of Object.entries(itemsSource)) {
+                            for (const item of items) {
+                                const normalizedItem = normalizeText(item);
+                                if (normalizedItem === combinedTerm || normalizedItem.includes(combinedTerm)) {
+                                    return { item, category };
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // SECOND: Search for EXACT matches only
+            for (const term of searchTerms) {
+                if (useCache) {
+                    for (const [category, items] of Object.entries(itemsSource)) {
+                        for (const itemData of items) {
+                            const itemName = itemData[lang];
+                            const normalizedItem = normalizeText(itemName);
+                            if (normalizedItem === term) {
+                                return { item: itemName, category };
+                            }
+                        }
+                    }
+                } else {
+                    for (const [category, items] of Object.entries(itemsSource)) {
+                        for (const item of items) {
+                            const normalizedItem = normalizeText(item);
+                            if (normalizedItem === term) {
+                                return { item, category };
+                            }
+                        }
+                    }
+                }
+
+                for (const [item, category] of Object.entries(customItems)) {
+                    const normalizedItem = normalizeText(item);
+                    if (normalizedItem === term) {
+                        return { item, category };
+                    }
+                }
+            }
+
+            // SECOND: Search for partial matches
+            for (const term of searchTerms) {
+                if (useCache) {
+                    for (const [category, items] of Object.entries(itemsSource)) {
+                        for (const itemData of items) {
+                            const itemName = itemData[lang];
+                            const normalizedItem = normalizeText(itemName);
+                            if (normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                                return { item: itemName, category };
+                            }
+                        }
+                    }
+                } else {
+                    for (const [category, items] of Object.entries(itemsSource)) {
+                        for (const item of items) {
+                            const normalizedItem = normalizeText(item);
+                            if (normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                                return { item, category };
+                            }
+                        }
+                    }
+                }
+
+                for (const [item, category] of Object.entries(customItems)) {
+                    const normalizedItem = normalizeText(item);
+                    if (normalizedItem.includes(term) || term.includes(normalizedItem)) {
+                        return { item, category };
+                    }
+                }
+            }
+
+            for (const term of searchTerms) {
+                const singular = term.endsWith('er') ? term.slice(0, -2) : term;
+                const plural = term + 'er';
+
+                if (useCache) {
+                    for (const [category, items] of Object.entries(itemsSource)) {
+                        for (const itemData of items) {
+                            const itemName = itemData[lang];
+                            const normalizedItem = normalizeText(itemName);
+                            if (normalizedItem === singular || normalizedItem === plural ||
+                                normalizedItem.includes(singular) || normalizedItem.includes(plural)) {
+                                return { item: itemName, category };
+                            }
+                        }
+                    }
+                } else {
+                    for (const [category, items] of Object.entries(itemsSource)) {
+                        for (const item of items) {
+                            const normalizedItem = normalizeText(item);
+                            if (normalizedItem === singular || normalizedItem === plural ||
+                                normalizedItem.includes(singular) || normalizedItem.includes(plural)) {
+                                return { item, category };
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        let pendingCustomItem = null;
+
+        function askUserForCategory(item) {
+            pendingCustomItem = item;
+            document.getElementById('categoryItemName').textContent = item;
+
+            const buttonsContainer = document.getElementById('categoryButtons');
+            buttonsContainer.innerHTML = CATEGORIES.map(cat => `
+                <button class="btn-secondary" onclick="selectCategoryForItem('${cat.replace(/'/g, "\\'")}')">
+                    ${t('categories.' + cat)}
+                </button>
+            `).join('');
+
+            document.getElementById('categoryModal').classList.add('active');
+        }
+
+        async function selectCategoryForItem(category) {
+            if (!pendingCustomItem) return;
+
+            const item = pendingCustomItem;
+            customItems[item] = category;
+            addItemToList(item, category);
+            saveToStorage();
+
+            // Send til admin for godkjenning
+            await submitItemForApproval(item, category);
+
+            closeCategoryModal();
+            pendingCustomItem = null;
+        }
+
+        function createNewCategory() {
+            const categoryName = prompt('Hva skal den nye kategorien hete?');
+            if (categoryName && categoryName.trim()) {
+                selectCategoryForItem(categoryName.trim());
+                // Send kategori til admin for godkjenning
+                submitCategoryForApproval(categoryName.trim());
+            }
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.remove('active');
+            pendingCustomItem = null;
+        }
+
+        async function submitItemForApproval(itemName, categoryName) {
+            console.log('submitItemForApproval called:', itemName, categoryName);
+
+            if (!auth.currentUser) {
+                console.error('Cannot submit for approval - not authenticated');
+                return;
+            }
+
+            try {
+                const docRef = await db.collection('pendingApprovals').add({
+                    type: 'item',
+                    status: 'pending',
+                    submittedBy: auth.currentUser.uid,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    reviewedAt: null,
+                    reviewedBy: null,
+                    data: {
+                        name_no: itemName,
+                        name_en: null,
+                        category: categoryName
+                    }
+                });
+                console.log('✅ Item sent for approval:', itemName, 'Doc ID:', docRef.id);
+            } catch (error) {
+                console.error('❌ Error submitting item:', error);
+                console.error('Error details:', error.code, error.message);
+            }
+        }
+
+        async function submitCategoryForApproval(categoryName) {
+            if (!auth.currentUser) return;
+
+            try {
+                // Sjekk om kategori allerede venter på godkjenning
+                const existing = await db.collection('pendingApprovals')
+                    .where('type', '==', 'category')
+                    .where('data.name_no', '==', categoryName)
+                    .where('status', '==', 'pending')
+                    .get();
+
+                if (!existing.empty) return;
+
+                await db.collection('pendingApprovals').add({
+                    type: 'category',
+                    status: 'pending',
+                    submittedBy: auth.currentUser.uid,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    reviewedAt: null,
+                    reviewedBy: null,
+                    data: {
+                        name_no: categoryName,
+                        name_en: null,
+                        emoji: '📦'
+                    }
+                });
+                console.log('Category sent for approval:', categoryName);
+            } catch (error) {
+                console.error('Error submitting category:', error);
+            }
+        }
+
+        async function addItemToList(name, category) {
+            const existingItem = shoppingList.find(item =>
+                normalizeText(item.name) === normalizeText(name) && item.category === category
+            );
+
+            if (!existingItem) {
+                let displayName = name;
+
+                const strongBeerTypes = ['ipa', 'stout', 'porter', 'brown ale', 'pale ale', 'wheat beer', 'witbier', 'sterkøl'];
+                const normalizedName = normalizeText(name);
+
+                if (category === 'Vinmonopolet' && strongBeerTypes.some(type => normalizedName.includes(type))) {
+                    if (!name.includes('(mulig polet)') && !normalizedName.includes('sterkøl')) {
+                        displayName = `${name} (mulig polet)`;
+                    }
+                }
+
+                const newItemId = Date.now() + Math.random();
+                const newItem = {
+                    id: newItemId,
+                    name: displayName,
+                    category,
+                    checked: false,
+                    note: '',
+                    addedBy: getCurrentNickname(),
+                    addedAt: new Date()
+                };
+
+                // Optimistic update
+                shoppingList.push(newItem);
+                lastAddedItemId = newItemId;
+                lastAddedCategory = category;
+                saveToStorage();
+                renderList();
+
+                // Sync to Firestore if shared
+                const listId = localStorage.getItem('activeListId');
+                if (listId) {
+                    try {
+                        await db.collection('sharedLists').doc(listId).update({
+                            items: shoppingList,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error syncing item:', error);
+                        // Rollback on error
+                        shoppingList = shoppingList.filter(i => i.id !== newItemId);
+                        renderList();
+                        alert('Kunne ikke legge til vare. Sjekk tilkobling.');
+                    }
+                }
+
+                // Clear highlight after animation
+                setTimeout(() => {
+                    lastAddedItemId = null;
+                }, 3000);
+            }
+        }
+
+        async function toggleItem(id) {
+            const item = shoppingList.find(item => item.id === id);
+            if (item) {
+                // Optimistic update
+                item.checked = !item.checked;
+                saveToStorage();
+                renderList();
+
+                // Sync to Firestore if shared
+                const listId = localStorage.getItem('activeListId');
+                if (listId) {
+                    try {
+                        await db.collection('sharedLists').doc(listId).update({
+                            items: shoppingList,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error toggling item:', error);
+                    }
+                }
+            }
+        }
+
+        async function deleteItem(id) {
+            // Optimistic update
+            shoppingList = shoppingList.filter(item => item.id !== id);
+            saveToStorage();
+            renderList();
+
+            // Sync to Firestore if shared
+            const listId = localStorage.getItem('activeListId');
+            if (listId) {
+                try {
+                    await db.collection('sharedLists').doc(listId).update({
+                        items: shoppingList,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error('Error deleting item:', error);
+                }
+            }
+        }
+
+        async function clearList() {
+            // Check if button is allowed to clear
+            const clearBtn = document.getElementById('clearBtn');
+            const canClear = clearBtn?.getAttribute('data-can-clear') === 'true';
+
+            if (!canClear) {
+                console.log('Clear button is disabled, ignoring click');
+                return;
+            }
+
+            if (shoppingList.length === 0) {
+                alert(t('alertListEmpty'));
+                return;
+            }
+
+            const listId = localStorage.getItem('activeListId');
+            const confirmMsg = listId
+                ? 'Er du sikker på at du vil tømme listen?\n\nListen blir tømt for alle deltakere, og delingen avsluttes. Hver person beholder sin lokale liste fra dette tidspunktet.'
+                : t('alertConfirmClear');
+
+            if (confirm(confirmMsg)) {
+                // Optimistic update
+                shoppingList = [];
+                saveToStorage();
+
+                // If shared, update Firestore and disconnect
+                if (listId) {
+                    try {
+                        await db.collection('sharedLists').doc(listId).update({
+                            items: [],
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (error) {
+                        console.error('Error clearing list:', error);
+                    }
+
+                    // Stop listening and clear shared state
+                    if (sharedListUnsubscribe) {
+                        sharedListUnsubscribe();
+                        sharedListUnsubscribe = null;
+                    }
+                    localStorage.removeItem('activeListId');
+                    localStorage.removeItem('userNickname');
+                }
+
+                renderList();
+                updateUI();
+                updateSharedListHeader();
+            }
+        }
+
+        function renderList() {
+            const container = document.getElementById('shoppingList');
+            updateSharedListHeader();
+            updateUI();  // Update button states when list changes
+
+            if (shoppingList.length === 0) {
+                container.innerHTML = '<div class="empty-list-placeholder">Listen er tom</div>';
+                return;
+            }
+
+            const grouped = {};
+            CATEGORIES.forEach(cat => {
+                grouped[cat] = shoppingList.filter(item => item.category === cat);
+            });
+
+            // Sort categories to show the last added category first
+            const sortedCategories = [...CATEGORIES].sort((a, b) => {
+                if (a === lastAddedCategory) return -1;
+                if (b === lastAddedCategory) return 1;
+                return 0;
+            });
+
+            container.innerHTML = sortedCategories.map(category => {
+                const items = grouped[category];
+                if (items.length === 0) return '';
+
+                const itemsHtml = items.map(item => {
+                    const isHighlighted = item.id === lastAddedItemId;
+                    const noteHtml = item.note ? `<div class="item-note">${item.note}</div>` : '';
+                    return `
+                        <div class="item ${item.checked ? 'checked' : ''} ${isHighlighted ? 'highlight' : ''}" onclick="toggleItem(${item.id})">
+                            <input type="checkbox" ${item.checked ? 'checked' : ''}>
+                            <div style="flex: 1;">
+                                <div class="item-name">${item.name}</div>
+                                ${noteHtml}
+                            </div>
+                            <button class="edit-note-btn" onclick="event.stopPropagation(); editNote(${item.id})" title="Rediger notat">✏️</button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteItem(${item.id})">×</button>
+                        </div>
+                    `;
+                }).join('');
+
+                const itemWord = currentLanguage === 'no' ?
+                    (items.length !== 1 ? 'varer' : 'vare') :
+                    (items.length !== 1 ? 'items' : 'item');
+
+                return `
+                    <div class="category">
+                        <div class="category-header">
+                            <span>${t('categories.' + category)}</span>
+                            <span class="category-count">${items.length} ${itemWord}</span>
+                        </div>
+                        <div class="items-list">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+
+        function parseText(text) {
+            let items = [];
+
+            text = text.replace(/\d+\.\s*/g, '\n');
+            text = text.replace(/[-•]\s*/g, '\n');
+
+            const lines = text.split('\n');
+
+            lines.forEach(line => {
+                if (line.includes(',')) {
+                    items.push(...line.split(','));
+                } else {
+                    items.push(line);
+                }
+            });
+
+            items = items.map(item => {
+                item = item.replace(/\b\d+\s*(kg|g|l|ml|stk|pk|boks|pose|brett|pakke)?\b/gi, '');
+                item = item.replace(/[^\wæøåÆØÅ\s]/g, ' ');
+                return item.trim();
+            }).filter(item => {
+                const words = item.toLowerCase().split(' ');
+                return item.length > 0 && !words.every(w => FILLER_WORDS.includes(w));
+            });
+
+            return items;
+        }
+
+
+        function saveToStorage() {
+            localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+            localStorage.setItem('customItems', JSON.stringify(customItems));
+            localStorage.setItem('learnedVariants', JSON.stringify(learnedVariants));
+        }
+
+        function loadFromStorage() {
+            const savedList = localStorage.getItem('shoppingList');
+            const savedCustom = localStorage.getItem('customItems');
+            const savedVariants = localStorage.getItem('learnedVariants');
+
+            if (savedList) shoppingList = JSON.parse(savedList);
+            if (savedCustom) customItems = JSON.parse(savedCustom);
+            if (savedVariants) learnedVariants = JSON.parse(savedVariants);
+        }
+
+        function generateShareCode() {
+            // 3 bokstaver + 1 tall (4 tegn totalt)
+            const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+            const numbers = '23456789';
+            let code = '';
+
+            // 3 bokstaver
+            for (let i = 0; i < 3; i++) {
+                code += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+
+            // 1 tall
+            code += numbers.charAt(Math.floor(Math.random() * numbers.length));
+
+            return code;
+        }
+
+        function getCurrentNickname() {
+            return localStorage.getItem('userNickname') || 'Meg';
+        }
+
+        function setupSharedListListener(listId) {
+            if (sharedListUnsubscribe) {
+                sharedListUnsubscribe();
+            }
+
+            sharedListUnsubscribe = db.collection('sharedLists')
+                .doc(listId)
+                .onSnapshot(snapshot => {
+                    if (!snapshot.exists) return;
+
+                    const data = snapshot.data();
+                    console.log('Shared list update - Items count:', data.items?.length || 0);
+                    shoppingList = data.items || [];
+                    renderList();
+                    saveToStorage();
+
+                    // Update participants badge and tooltip
+                    if (data.participants && data.participants.length > 0) {
+                        const myNickname = getCurrentNickname();
+                        const count = data.participants.length;
+
+                        // Update badge text
+                        const badgeText = document.getElementById('badgeText');
+                        if (count === 1) {
+                            badgeText.textContent = 'Delt';
+                        } else {
+                            badgeText.textContent = `${count} deltakere`;
+                        }
+
+                        // Update tooltip content
+                        const participantsList = document.getElementById('participantsList');
+                        participantsList.innerHTML = data.participants.map(p => {
+                            const isSelf = p.nickname === myNickname;
+                            return `<div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="color: #34c759; font-size: 10px;">●</span>
+                                <span style="${isSelf ? 'font-weight: 600;' : ''}">${p.nickname}${isSelf ? ' (deg)' : ''}</span>
+                            </div>`;
+                        }).join('');
+                    }
+                }, error => {
+                    console.error('Error listening to shared list:', error);
+                });
+        }
+
+        function updateSharedListHeader() {
+            // Badge removed - function kept for compatibility
+        }
+
+        async function shareList() {
+            console.log('=== shareList() called ===');
+
+            if (shoppingList.length === 0) {
+                alert(t('alertEmptyBeforeShare'));
+                return;
+            }
+
+            // Check authentication - wait if needed
+            if (!auth.currentUser) {
+                console.log('Not authenticated, waiting...');
+                alert('Autentisering pågår, vent 2 sekunder og prøv igjen...');
+                return;
+            }
+
+            // Check if list is already shared
+            const activeListId = localStorage.getItem('activeListId');
+            const userNickname = localStorage.getItem('userNickname');
+
+            let shareCode, listRef, isActive;
+
+            if (activeListId) {
+                // List already shared
+                console.log('List already shared, fetching existing share code');
+                listRef = db.collection('sharedLists').doc(activeListId);
+
+                try {
+                    const doc = await listRef.get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        shareCode = data.shareCode;
+                        isActive = data.isActive !== false; // Default to true if not set
+                        console.log('Found existing share code:', shareCode, 'isActive:', isActive);
+
+                        // If user is listesjef, show toggle modal
+                        if (userNickname === 'Listesjef') {
+                            showSharingToggleModal(shareCode, isActive, activeListId);
+                            return;
+                        }
+                    } else {
+                        console.error('Shared list document not found');
+                        alert('Feil: Kunne ikke finne delt liste. Prøv å tømme og dele på nytt.');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error fetching shared list:', error);
+                    alert('Feil ved henting av delingsinformasjon: ' + error.message);
+                    return;
+                }
+            } else {
+                // Create new shared list
+                shareCode = generateShareCode();
+                listRef = db.collection('sharedLists').doc();
+
+                console.log('Sharing list with', shoppingList.length, 'items');
+
+                try {
+                    await listRef.set({
+                        name: 'Handleliste',
+                        ownerId: auth.currentUser.uid,
+                        items: shoppingList,
+                        participants: [{
+                            userId: auth.currentUser.uid,
+                            nickname: 'Listesjef',
+                            joinedAt: new Date()
+                        }],
+                        shareCode: shareCode,
+                        isActive: true,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: null
+                    });
+
+                    console.log('Firestore document created successfully!');
+
+                    localStorage.setItem('activeListId', listRef.id);
+                    localStorage.setItem('userNickname', 'Listesjef');
+                    setupSharedListListener(listRef.id);
+                    updateUI();
+                } catch (error) {
+                    console.error('Error creating shared list:', error);
+                    alert('FEIL: ' + error.code + '\n' + error.message);
+                    return;
+                }
+            }
+
+            // Show sharing info
+            document.getElementById('shareCode').value = shareCode;
+
+            console.log('Opening modal...');
+            document.getElementById('shareModal').classList.add('active');
+            updateSharedListHeader();
+            console.log('Liste delt med kode:', shareCode);
+        }
+
+        async function joinSharedList(shareCode, nickname) {
+            try {
+                // Ensure user is authenticated
+                if (!auth.currentUser) {
+                    console.error('Not authenticated when joining');
+                    alert('Vennligst vent litt og prøv igjen (autentisering pågår)');
+                    return;
+                }
+
+                const listsSnapshot = await db.collection('sharedLists')
+                    .where('shareCode', '==', shareCode.toUpperCase())
+                    .limit(1)
+                    .get();
+
+                if (listsSnapshot.empty) {
+                    alert('Ugyldig kode. Prøv igjen.');
+                    return;
+                }
+
+                const listDoc = listsSnapshot.docs[0];
+                const listData = listDoc.data();
+                const listId = listDoc.id;
+
+                // Check if sharing is active
+                const isActive = listData.isActive !== false;
+                if (!isActive) {
+                    alert('Denne listen er ikke lenger tilgjengelig for deling. Kontakt listesjefen.');
+                    return;
+                }
+
+                await listDoc.ref.update({
+                    participants: firebase.firestore.FieldValue.arrayUnion({
+                        userId: auth.currentUser.uid,
+                        nickname: nickname,
+                        joinedAt: new Date()
+                    })
+                });
+
+                localStorage.setItem('activeListId', listId);
+                localStorage.setItem('userNickname', nickname);
+
+                console.log('Joined list:', listId, 'Items:', listData.items);
+
+                setupSharedListListener(listId);
+                updateUI();
+                updateSharedListHeader();
+
+                alert(`Koblet til listen som "${nickname}"!`);
+            } catch (error) {
+                console.error('Error joining list:', error);
+                alert('Kunne ikke koble til liste. Prøv igjen.');
+            }
+        }
+
+        async function checkUrlJoin() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const joinCode = urlParams.get('join');
+
+            if (joinCode) {
+                const nickname = prompt('Hva er ditt kallenavn?');
+                if (nickname && nickname.trim()) {
+                    await joinSharedList(joinCode, nickname.trim());
+                }
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        }
+
+        async function deleteSharedList() {
+            const listId = localStorage.getItem('activeListId');
+            if (!listId) {
+                alert('Ingen delt liste å slette.');
+                return;
+            }
+
+            if (!confirm('Er du sikker på at du vil slette denne delte listen? Alle deltakere vil miste tilgang.')) {
+                return;
+            }
+
+            try {
+                // Stop listening
+                if (sharedListUnsubscribe) {
+                    sharedListUnsubscribe();
+                    sharedListUnsubscribe = null;
+                }
+
+                // Delete from Firestore
+                await db.collection('sharedLists').doc(listId).delete();
+
+                // Clear local state
+                localStorage.removeItem('activeListId');
+                localStorage.removeItem('userNickname');
+                shoppingList = [];
+                saveToStorage();
+                renderList();
+                updateUI();
+                updateSharedListHeader();
+
+                alert('Listen er slettet!');
+            } catch (error) {
+                console.error('Error deleting shared list:', error);
+                alert('Kunne ikke slette liste. Prøv igjen.');
+            }
+        }
+
+        async function cleanupOldLists() {
+            try {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                const oldLists = await db.collection('sharedLists')
+                    .where('updatedAt', '<', thirtyDaysAgo)
+                    .get();
+
+                if (oldLists.empty) {
+                    console.log('Ingen gamle lister å slette');
+                    return;
+                }
+
+                const batch = db.batch();
+                oldLists.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                console.log(`Slettet ${oldLists.size} gamle lister`);
+            } catch (error) {
+                console.error('Error cleaning up old lists:', error);
+            }
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        async function showSharingToggleModal(shareCode, isActive, listId) {
+            document.getElementById('toggleShareCode').value = shareCode;
+            document.getElementById('sharingToggleModal').setAttribute('data-list-id', listId);
+            updateSharingToggleUI(isActive);
+
+            // Load participants
+            await loadModalParticipants(listId);
+
+            document.getElementById('sharingToggleModal').classList.add('active');
+        }
+
+        async function loadModalParticipants(listId) {
+            const participantsList = document.getElementById('modalParticipantsList');
+
+            try {
+                const listRef = db.collection('sharedLists').doc(listId);
+                const doc = await listRef.get();
+
+                if (doc.exists) {
+                    const participants = doc.data().participants || [];
+
+                    if (participants.length === 0) {
+                        participantsList.innerHTML = '<div style="color: #86868b; font-size: 13px;">Ingen deltakere ennå</div>';
+                        return;
+                    }
+
+                    participantsList.innerHTML = participants.map(p => {
+                        const joinedDate = p.joinedAt?.toDate ? p.joinedAt.toDate() : new Date(p.joinedAt);
+                        const timeAgo = getTimeAgo(joinedDate);
+
+                        return `
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">${p.nickname}</div>
+                                    <div style="font-size: 12px; color: #86868b;">Koblet til ${timeAgo}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    participantsList.innerHTML = '<div style="color: #86868b; font-size: 13px;">Kunne ikke laste deltakere</div>';
+                }
+            } catch (error) {
+                console.error('Error loading participants:', error);
+                participantsList.innerHTML = '<div style="color: #ff3b30; font-size: 13px;">Feil ved lasting av deltakere</div>';
+            }
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+
+            if (seconds < 60) return 'nettopp';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} min siden`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)} timer siden`;
+            return `${Math.floor(seconds / 86400)} dager siden`;
+        }
+
+        function closeSharingToggleModal() {
+            document.getElementById('sharingToggleModal').classList.remove('active');
+        }
+
+        function updateSharingToggleUI(isActive) {
+            const toggleBtn = document.getElementById('toggleSharingBtn');
+            const statusText = document.getElementById('sharingStatusText');
+
+            if (isActive) {
+                toggleBtn.textContent = 'Deaktiver';
+                toggleBtn.style.background = '#34c759';
+                toggleBtn.style.color = 'white';
+                statusText.textContent = 'Andre kan koble seg til med koden';
+            } else {
+                toggleBtn.textContent = 'Aktiver';
+                toggleBtn.style.background = '#ff3b30';
+                toggleBtn.style.color = 'white';
+                statusText.textContent = 'Deling er deaktivert - ingen kan koble seg til';
+            }
+        }
+
+        async function toggleSharing() {
+            const modal = document.getElementById('sharingToggleModal');
+            const listId = modal.getAttribute('data-list-id');
+
+            if (!listId) {
+                alert('Feil: Kunne ikke finne liste-ID');
+                return;
+            }
+
+            try {
+                const listRef = db.collection('sharedLists').doc(listId);
+                const doc = await listRef.get();
+
+                if (!doc.exists) {
+                    alert('Feil: Listen finnes ikke');
+                    return;
+                }
+
+                const currentStatus = doc.data().isActive !== false;
+                const newStatus = !currentStatus;
+
+                await listRef.update({
+                    isActive: newStatus,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                updateSharingToggleUI(newStatus);
+                updateUI(); // Update share button color
+            } catch (error) {
+                console.error('Error toggling sharing:', error);
+                alert('Feil ved endring av delingsstatus: ' + error.message);
+            }
+        }
+
+        async function updateShareButtonColor(listId, shareBtn) {
+            try {
+                const listRef = db.collection('sharedLists').doc(listId);
+                const doc = await listRef.get();
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    const isActive = data.isActive !== false;
+                    const participants = data.participants || [];
+
+                    // Only turn green if list is active AND has more than 1 participant (someone other than Listesjef has joined)
+                    if (isActive && participants.length > 1) {
+                        shareBtn.style.background = '#34c759'; // Green - list is shared with others
+                    } else if (!isActive) {
+                        shareBtn.style.background = '#ff3b30'; // Red - sharing is paused
+                    } else {
+                        shareBtn.style.background = ''; // Default - list created but not shared yet
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating share button color:', error);
+            }
+        }
+
+        async function copyShareCode() {
+            const codeInput = document.getElementById('shareCode');
+            const code = codeInput.value;
+
+            try {
+                // Modern Clipboard API (fungerer på mobil)
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(code);
+                } else {
+                    // Fallback for eldre nettlesere
+                    codeInput.select();
+                    codeInput.setSelectionRange(0, 99999);
+                    document.execCommand('copy');
+                }
+
+                // Close modal
+                document.getElementById('shareModal').classList.remove('active');
+            } catch (error) {
+                console.error('Copy failed:', error);
+                alert('Kunne ikke kopiere kode. Prøv igjen.');
+            }
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('active');
+            document.getElementById('importCode').value = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+        }
+
+        function showInfoModal() {
+            document.getElementById('infoModal').classList.add('active');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        function toggleBurgerMenu() {
+            const menu = document.getElementById('burgerMenu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        function closeBurgerMenu() {
+            document.getElementById('burgerMenu').style.display = 'none';
+        }
+
+        // Close burger menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('burgerMenu');
+            const btn = document.querySelector('.burger-menu-btn');
+
+            if (menu && btn && !menu.contains(event.target) && !btn.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+
+        async function importList() {
+            const code = document.getElementById('importCode').value.trim().toUpperCase();
+
+            if (!code) return;
+
+            // Check if it's a 4-character share code (3 letters + 1 number)
+            if (code.length === 4 && /^[A-Z0-9]+$/.test(code)) {
+                closeImportModal();
+                const nickname = prompt('Hva er ditt kallenavn?');
+                if (nickname && nickname.trim()) {
+                    await joinSharedList(code, nickname.trim());
+                }
+                return;
+            }
+
+            // Otherwise, show error
+            alert('Ugyldig kode. Skriv inn 6-tegns delekode.');
+        }
+
+        function editNote(id) {
+            const item = shoppingList.find(item => item.id === id);
+            if (!item) return;
+
+            currentEditingItemId = id;
+            document.getElementById('noteItemName').textContent = item.name;
+            document.getElementById('noteInput').value = item.note || '';
+            document.getElementById('noteModal').classList.add('active');
+
+            setTimeout(() => {
+                document.getElementById('noteInput').focus();
+            }, 100);
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            currentEditingItemId = null;
+        }
+
+        async function saveNote() {
+            if (!currentEditingItemId) return;
+
+            const item = shoppingList.find(item => item.id === currentEditingItemId);
+            if (!item) return;
+
+            item.note = document.getElementById('noteInput').value.trim();
+
+            saveToStorage();
+            renderList();
+            closeNoteModal();
+
+            // Sync to Firestore if shared
+            const listId = localStorage.getItem('activeListId');
+            if (listId) {
+                try {
+                    await db.collection('sharedLists').doc(listId).update({
+                        items: shoppingList,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error('Error saving note:', error);
+                }
+            }
+        }
+
+        initializeApp();
+    </script>
+</body>
+</html>
