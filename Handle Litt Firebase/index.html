@@ -1229,7 +1229,6 @@
                     'Skredder': '🧵 Skredder',
                     'Bensinstasjon': '⛽ Bensinstasjon',
                     'Post': '📮 Post',
-                    'Diverse': '📦 Diverse',
                     'Ukategorisert': '❓ Ukategorisert'
                 },
                 footerCredit: 'Et lite prosjekt av Hallvar Bugge Johnsen',
@@ -1292,7 +1291,6 @@
                     'Skredder': '🧵 Tailor',
                     'Bensinstasjon': '⛽ Gas Station',
                     'Post': '📮 Post Office',
-                    'Diverse': '📦 Miscellaneous',
                     'Ukategorisert': '❓ Uncategorized'
                 },
                 footerCredit: 'A small project by Hallvar Bugge Johnsen',
@@ -1328,7 +1326,6 @@
             'Skredder',
             'Bensinstasjon',
             'Post',
-            'Diverse',
             'Ukategorisert'
         ];
 
@@ -1376,13 +1373,17 @@
             'Brød & Bakervarer': [
                 'brød', 'loff', 'rundstykker', 'baguett', 'ciabatta', 'focaccia', 'grovbrød', 'kneippbrød',
                 'byggbrød', 'havregrøt', 'havrebrød', 'pitabrød', 'tortilla', 'wraps',
+                'tacoskjell', 'tacoskjell glutenfrie',
                 'bagel', 'croissant', 'bolle', 'kanelboller', 'wienbrød', 'skolebrød', 'kaker', 'wienerbrød',
                 'knekkebrød', 'kavring', 'kornkjeks', 'kjeks', 'riskjeks', 'havregrøtmel', 'müsli', 'frokostblanding',
                 'cornflakes', 'havregryn', 'havregrynspudding', 'mandelskiver', 'mandelflak', 'sjokoladebiter', 'sjokoladedråper'
             ],
             'Tørrvarelager & Hermetikk': [
                 'pasta', 'spaghetti', 'makaroni', 'penne', 'fusilli', 'lasagneplater', 'tortellini', 'ravioli',
+                'nudler', 'risnudler', 'glassnudler', 'eggnudler', 'ramen',
                 'ris', 'jasminris', 'basmatiris', 'risotto', 'parboiled ris', 'sushiris',
+                'quinoa', 'bulgur', 'couscous',
+                'linser', 'linser røde', 'linser grønne', 'linser brune',
                 'mel', 'hvetemel', 'sammalt hvete', 'glutenfritt mel', 'mandelmel', 'siktet sammalt hvete',
                 'sukker', 'melis', 'flormelis', 'brunt sukker', 'rørsukker', 'honning', 'sirup', 'agavesirup',
                 'havsalt', 'bordsalt', 'pepper', 'paprika', 'karri', 'kanel', 'muskatnøtt', 'nellik',
@@ -1410,6 +1411,7 @@
                 'dill', 'gressløk', 'mynta', 'salvie', 'estragon', 'laurbærblad', 'karri', 'karripasta',
                 'kurkuma', 'spisskummen', 'koriafrø', 'chiliflak', 'chipotle', 'cayennepepper',
                 'paprikapulver', 'søt paprika', 'røkt paprika', 'hvitløkspulver', 'løkpulver',
+                'tacokrydder',
                 'muskatnøtt', 'kardemomme', 'nellik', 'stjerneanis', 'kanel', 'vaniljesukker', 'ingefær',
                 'sesamfrø', 'valmuefrø', 'solsikkefrø', 'gresskarkjerner', 'chiafrø', 'linfrø'
             ],
@@ -1437,6 +1439,7 @@
                 'badrens', 'kalkfjerner', 'universal rengjøringsmiddel', 'ovnsrens', 'komfyrrens',
                 'tøyvask', 'vaskemiddel', 'flytende vaskemiddel', 'tøymykner', 'fargeark', 'vaskepulver',
                 'såpeflak', 'flekktjerner', 'blekmiddel', 'uldvask',
+                'tannkrem', 'tannbørste', 'tanntråd', 'munnvann',
                 'søppelposer', 'matposer', 'fryseposer', 'brødposer', 'aluminiumsfolie', 'plastfolie', 'bakepapir'
             ],
             'Vinmonopolet': [
@@ -1757,7 +1760,16 @@
             'kan', 'du', 'handle', 'kjøpe', 'hente', 'få', 'tak', 'i', 'trenger', 'må', 'ha',
             'litt', 'noe', 'noen', 'en', 'et', 'ei', 'og', 'eller', 'også', 'takk', 'tusen', 'vennligst',
             'gjerne', 'kanskje', 'om', 'mulig', 'hvis', 'dersom', 'når', 'hei', 'hallo', 'hey',
-            'ja', 'ah', 'åh', 'oh', 'nei', 'ok', 'okay'
+            'ja', 'ah', 'åh', 'oh', 'nei', 'ok', 'okay',
+            // Støy-ord for naturlige meldinger
+            'skal', 'vil', 'skulle', 'ville', 'burde', 'bør', 'kunne',
+            'morgen', 'dag', 'idag', 'ettermiddag', 'kveld', 'natt',
+            'vet', 'hvordan', 'det', 'er', 'bare', 'alt', 'nå', 'ellers', 'glemmer', 'halvparten',
+            'husker', 'mer', 'på', 'veien', 'dit', 'der', 'hit', 'her',
+            'selvfølgelig', 'selvsagt', 'klart', 'jo', 'visst',
+            'nesten', 'glemte', 'viktigste', 'haha', 'ha', 'he', 'hi',
+            'får', 'se', 'sikkert', 'nok',
+            'men', 'som', 'for', 'til', 'av', 'med', 'fra', 'ved', 'over', 'under'
         ];
 
         const ADJECTIVES = [
@@ -2746,6 +2758,28 @@
             }
         }
 
+        const SYNONYMS = {
+            'hermetisk': ['på boks', 'hermetiske', 'boks'],
+            'fersk': ['frisk', 'friske', 'ferske'],
+            'rød': ['røde', 'rødlige'],
+            'gul': ['gule', 'gylne'],
+            'grønn': ['grønne'],
+            'naturell': ['natur', 'naturlige'],
+            'hel': ['hele'],
+            'halv': ['halve'],
+            'lett': ['lettre', 'lette', 'light'],
+            'ekstra': ['super']
+        };
+
+        function expandWithSynonyms(word) {
+            for (const [key, values] of Object.entries(SYNONYMS)) {
+                if (word === key || values.includes(word)) {
+                    return [key, ...values, word];
+                }
+            }
+            return [word];
+        }
+
         function findBestMatch(normalized) {
             const words = normalized.split(' ').filter(w => !FILLER_WORDS.includes(w));
             const cleanedWords = words.filter(w => {
@@ -2853,33 +2887,60 @@
                 }
             }
 
-            // SECOND: Search for partial matches
+            // SECOND: Search for partial matches WITH synonyms and word-order flexibility
             for (const term of searchTerms) {
-                if (useCache) {
-                    for (const [category, items] of Object.entries(itemsSource)) {
-                        for (const itemData of items) {
-                            const itemName = itemData[lang];
-                            const normalizedItem = normalizeText(itemName);
-                            if (normalizedItem.includes(term) || term.includes(normalizedItem)) {
-                                return { item: itemName, category };
-                            }
-                        }
-                    }
-                } else {
-                    for (const [category, items] of Object.entries(itemsSource)) {
-                        for (const item of items) {
-                            const normalizedItem = normalizeText(item);
-                            if (normalizedItem.includes(term) || term.includes(normalizedItem)) {
-                                return { item, category };
-                            }
-                        }
-                    }
-                }
+                // Utvid med synonymer
+                const synonyms = expandWithSynonyms(term);
 
-                for (const [item, category] of Object.entries(customItems)) {
-                    const normalizedItem = normalizeText(item);
-                    if (normalizedItem.includes(term) || term.includes(normalizedItem)) {
-                        return { item, category };
+                for (const synonym of synonyms) {
+                    if (useCache) {
+                        for (const [category, items] of Object.entries(itemsSource)) {
+                            for (const itemData of items) {
+                                const itemName = itemData[lang];
+                                const normalizedItem = normalizeText(itemName);
+                                const itemWords = normalizedItem.split(' ');
+
+                                // Match hvis ordet finnes i varen (uavhengig av rekkefølge)
+                                if (itemWords.includes(synonym)) {
+                                    return { item: itemName, category };
+                                }
+
+                                // Original partial matching
+                                if (normalizedItem.includes(synonym) || synonym.includes(normalizedItem)) {
+                                    return { item: itemName, category };
+                                }
+                            }
+                        }
+                    } else {
+                        for (const [category, items] of Object.entries(itemsSource)) {
+                            for (const item of items) {
+                                const normalizedItem = normalizeText(item);
+                                const itemWords = normalizedItem.split(' ');
+
+                                // Match hvis ordet finnes i varen (uavhengig av rekkefølge)
+                                if (itemWords.includes(synonym)) {
+                                    return { item, category };
+                                }
+
+                                // Original partial matching
+                                if (normalizedItem.includes(synonym) || synonym.includes(normalizedItem)) {
+                                    return { item, category };
+                                }
+                            }
+                        }
+                    }
+
+                    for (const [item, category] of Object.entries(customItems)) {
+                        const normalizedItem = normalizeText(item);
+                        const itemWords = normalizedItem.split(' ');
+
+                        if (itemWords.includes(synonym)) {
+                            return { item, category };
+                        }
+
+                        if (normalizedItem.includes(synonym) || synonym.includes(normalizedItem)) {
+                            return { item, category };
+                        }
                     }
                 }
             }
@@ -3274,6 +3335,35 @@
             }).join('');
         }
 
+        function isNoisePhrase(text) {
+            if (!text || text.trim().length === 0) return true;
+
+            const normalized = normalizeText(text).toLowerCase();
+            const words = normalized.split(' ').filter(w => w.length > 0);
+
+            // Hvis > 70% av ordene er filler words, det er støy
+            const fillerCount = words.filter(w => FILLER_WORDS.includes(w)).length;
+            if (words.length > 0 && (fillerCount / words.length) > 0.7) {
+                return true;
+            }
+
+            // Spesifikke støy-fraser (korte setninger uten matvarer)
+            const noisePhrases = [
+                'skal handle', 'skal på butikken', 'må handle',
+                'får se', 'nesten glemte', 'å ja', 'oh ja', 'ja og',
+                'det viktigste', 'viktigste', 'haha', 'he he',
+                'i morgen', 'i dag', 'i kveld',
+                'du vet hvordan', 'ellers glemmer', 'husker noe mer'
+            ];
+
+            for (const phrase of noisePhrases) {
+                if (normalized.includes(phrase)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         function parseText(text) {
             let items = [];
@@ -3284,20 +3374,39 @@
             const lines = text.split('\n');
 
             lines.forEach(line => {
+                // Fjern støy-setninger
+                if (isNoisePhrase(line)) {
+                    return; // Skip denne linja
+                }
+
                 if (line.includes(',')) {
-                    items.push(...line.split(','));
+                    const parts = line.split(',');
+                    parts.forEach(part => {
+                        if (!isNoisePhrase(part)) {
+                            items.push(part);
+                        }
+                    });
                 } else {
                     items.push(line);
                 }
             });
 
             items = items.map(item => {
+                // Fjern kvantiteter
                 item = item.replace(/\b\d+\s*(kg|g|l|ml|stk|pk|boks|pose|brett|pakke)?\b/gi, '');
+
+                // Fjern beskrivende fraser i parentes
+                item = item.replace(/\([^)]*\)/g, ' ');
+
+                // Fjern spesialtegn
                 item = item.replace(/[^\wæøåÆØÅ\s]/g, ' ');
                 return item.trim();
             }).filter(item => {
-                const words = item.toLowerCase().split(' ');
-                return item.length > 0 && !words.every(w => FILLER_WORDS.includes(w));
+                const words = item.toLowerCase().split(' ').filter(w => w.length > 0);
+
+                // Fjern hvis kun støy-ord
+                const meaningfulWords = words.filter(w => !FILLER_WORDS.includes(w));
+                return meaningfulWords.length > 0;
             });
 
             return items;
