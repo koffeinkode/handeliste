@@ -1044,7 +1044,7 @@
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; align-items: center; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 16px;">
+                <div id="listeSjefControls" style="display: flex; gap: 10px; align-items: center; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 16px;">
                     <div style="flex: 1;">
                         <div style="font-weight: 600; margin-bottom: 4px;">Deling aktiv</div>
                         <div style="font-size: 13px; color: #86868b;" id="sharingStatusText">Andre kan koble seg til med koden</div>
@@ -1053,6 +1053,10 @@
                         Deaktiver
                     </button>
                 </div>
+
+                <button id="leaveListBtn" onclick="leaveSharedList()" class="btn-secondary" style="width: 100%; margin-bottom: 12px; display: none; background: #ff3b30; color: white;">
+                    Meld ut av liste
+                </button>
 
                 <button class="btn-secondary" onclick="closeSharingToggleModal()" style="width: 100%;">Lukk</button>
             </div>
@@ -3364,11 +3368,9 @@
                 }
             }
 
-            // Show sharing info
-            document.getElementById('shareCode').value = shareCode;
-
-            console.log('Opening modal...');
-            document.getElementById('shareModal').classList.add('active');
+            // Show admin modal for Listesjef (both for new and existing lists)
+            console.log('Opening admin modal...');
+            showSharingToggleModal(shareCode, isActive !== false, listRef.id);
             updateSharedListHeader();
             console.log('Liste delt med kode:', shareCode);
         }
@@ -3508,9 +3510,16 @@
         }
 
         async function showSharingToggleModal(shareCode, isActive, listId) {
+            const userNickname = localStorage.getItem('userNickname');
+            const isListesjef = userNickname === 'Listesjef';
+
             document.getElementById('toggleShareCode').value = shareCode;
             document.getElementById('sharingToggleModal').setAttribute('data-list-id', listId);
             updateSharingToggleUI(isActive);
+
+            // Show/hide controls based on role
+            document.getElementById('listeSjefControls').style.display = isListesjef ? 'flex' : 'none';
+            document.getElementById('leaveListBtn').style.display = isListesjef ? 'none' : 'block';
 
             // Load participants
             await loadModalParticipants(listId);
@@ -3567,6 +3576,58 @@
 
         function closeSharingToggleModal() {
             document.getElementById('sharingToggleModal').classList.remove('active');
+        }
+
+        async function leaveSharedList() {
+            const confirmation = confirm('Er du sikker på at du vil melde deg ut av listen? Du mister tilgang til den delte listen.');
+            if (!confirmation) return;
+
+            try {
+                const activeListId = localStorage.getItem('activeListId');
+                const userId = auth.currentUser?.uid;
+
+                if (!activeListId || !userId) {
+                    alert('Kunne ikke finne listeinformasjon');
+                    return;
+                }
+
+                const listRef = db.collection('sharedLists').doc(activeListId);
+                const doc = await listRef.get();
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    const participants = data.participants || [];
+
+                    // Remove current user from participants
+                    const updatedParticipants = participants.filter(p => p.userId !== userId);
+
+                    await listRef.update({
+                        participants: updatedParticipants,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Clear local state
+                    localStorage.removeItem('activeListId');
+                    localStorage.removeItem('userNickname');
+                    shoppingList = [];
+                    saveList();
+
+                    // Update UI
+                    updateUI();
+                    updateSharedListHeader();
+                    renderList();
+
+                    // Close modal
+                    closeSharingToggleModal();
+
+                    alert('Du har meldt deg ut av listen');
+                } else {
+                    alert('Fant ikke listen');
+                }
+            } catch (error) {
+                console.error('Error leaving shared list:', error);
+                alert('Feil ved utmelding: ' + error.message);
+            }
         }
 
         function updateSharingToggleUI(isActive) {
