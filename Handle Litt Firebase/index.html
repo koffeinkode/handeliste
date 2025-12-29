@@ -3335,8 +3335,11 @@
                 // Create new shared list
                 shareCode = generateShareCode();
                 listRef = db.collection('sharedLists').doc();
+                isActive = true; // Set isActive for new lists
 
                 console.log('Sharing list with', shoppingList.length, 'items');
+                console.log('Generated share code:', shareCode);
+                console.log('List ref ID:', listRef.id);
 
                 try {
                     await listRef.set({
@@ -3355,24 +3358,35 @@
                         expiresAt: null
                     });
 
-                    console.log('Firestore document created successfully!');
+                    console.log('✅ Firestore document created successfully!');
 
                     localStorage.setItem('activeListId', listRef.id);
                     localStorage.setItem('userNickname', 'Listesjef');
+                    console.log('✅ Local storage updated');
+
                     setupSharedListListener(listRef.id);
+                    console.log('✅ Listener setup complete');
+
                     updateUI();
+                    console.log('✅ UI updated');
                 } catch (error) {
-                    console.error('Error creating shared list:', error);
-                    alert('FEIL: ' + error.code + '\n' + error.message);
+                    console.error('❌ Error creating shared list:', error);
+                    alert('FEIL ved opprettelse av delt liste:\n' + error.code + '\n' + error.message);
                     return;
                 }
             }
 
             // Show admin modal for Listesjef (both for new and existing lists)
-            console.log('Opening admin modal...');
-            showSharingToggleModal(shareCode, isActive !== false, listRef.id);
+            console.log('📋 Opening admin modal with shareCode:', shareCode, 'isActive:', isActive, 'listId:', listRef.id);
+            try {
+                await showSharingToggleModal(shareCode, isActive !== false, listRef.id);
+                console.log('✅ Modal opened successfully');
+            } catch (error) {
+                console.error('❌ Error opening modal:', error);
+                alert('Feil ved åpning av delingsmodal: ' + error.message);
+            }
             updateSharedListHeader();
-            console.log('Liste delt med kode:', shareCode);
+            console.log('✅ Liste delt med kode:', shareCode);
         }
 
         async function joinSharedList(shareCode, nickname) {
