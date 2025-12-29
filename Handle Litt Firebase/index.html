@@ -1094,7 +1094,7 @@
                 <p style="margin: 0 0 24px 0; font-size: 15px;" id="aboutModalPrivacy">
                     🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.
                 </p>
-                <p style="margin: 0 0 12px 0; font-size: 11px; color: #a1a1a6; font-style: italic;">
+                <p style="margin: 0 0 12px 0; font-size: 11px; color: #a1a1a6; font-style: italic;" id="aboutModalVibecoded">
                     Vibekodet med Claude Code - Versjon 137.3
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #86868b;">
@@ -1225,7 +1225,8 @@
                 about: 'Om',
                 aboutModalTitle: 'Om Handle Litt',
                 aboutModalCredit: 'Et lite prosjekt av Hallvar Bugge Johnsen',
-                aboutModalPrivacy: '🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.'
+                aboutModalPrivacy: '🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.',
+                aboutModalVibecoded: 'Vibekodet med Claude Code - Versjon 137.3'
             },
             en: {
                 appTitle: 'Handle Litt',
@@ -1286,7 +1287,8 @@
                 about: 'About',
                 aboutModalTitle: 'About Handle Litt',
                 aboutModalCredit: 'A small project by Hallvar Bugge Johnsen',
-                aboutModalPrivacy: '🔒 Your list is stored locally on your device. When you share it, it is stored online for 30 days for real-time sync.'
+                aboutModalPrivacy: '🔒 Your list is stored locally on your device. When you share it, it is stored online for 30 days for real-time sync.',
+                aboutModalVibecoded: 'Vibecoded with Claude Code - Version 137.3'
             }
         };
 
@@ -2311,6 +2313,11 @@
             const aboutModalPrivacy = document.getElementById('aboutModalPrivacy');
             if (aboutModalPrivacy) {
                 aboutModalPrivacy.textContent = t('aboutModalPrivacy');
+            }
+
+            const aboutModalVibecoded = document.getElementById('aboutModalVibecoded');
+            if (aboutModalVibecoded) {
+                aboutModalVibecoded.textContent = t('aboutModalVibecoded');
             }
 
             // Enable/disable buttons based on list content
