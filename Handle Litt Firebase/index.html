@@ -3529,6 +3529,8 @@
 
         async function loadModalParticipants(listId) {
             const participantsList = document.getElementById('modalParticipantsList');
+            const userNickname = localStorage.getItem('userNickname');
+            const isListesjef = userNickname === 'Listesjef';
 
             try {
                 const listRef = db.collection('sharedLists').doc(listId);
@@ -3545,13 +3547,19 @@
                     participantsList.innerHTML = participants.map(p => {
                         const joinedDate = p.joinedAt?.toDate ? p.joinedAt.toDate() : new Date(p.joinedAt);
                         const timeAgo = getTimeAgo(joinedDate);
+                        const canRemove = isListesjef && p.nickname !== 'Listesjef';
 
                         return `
-                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
                                 <div>
                                     <div style="font-weight: 600; font-size: 14px;">${p.nickname}</div>
                                     <div style="font-size: 12px; color: #86868b;">Koblet til ${timeAgo}</div>
                                 </div>
+                                ${canRemove ? `
+                                    <button onclick="removeParticipant('${p.userId}', '${p.nickname}')" style="padding: 6px 12px; background: #ff3b30; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600;">
+                                        Fjern
+                                    </button>
+                                ` : ''}
                             </div>
                         `;
                     }).join('');
@@ -3576,6 +3584,49 @@
 
         function closeSharingToggleModal() {
             document.getElementById('sharingToggleModal').classList.remove('active');
+        }
+
+        async function removeParticipant(userId, nickname) {
+            const confirmation = confirm(`Er du sikker på at du vil fjerne "${nickname}" fra listen?`);
+            if (!confirmation) return;
+
+            try {
+                const activeListId = localStorage.getItem('activeListId');
+                if (!activeListId) {
+                    alert('Kunne ikke finne listeinformasjon');
+                    return;
+                }
+
+                const listRef = db.collection('sharedLists').doc(activeListId);
+                const doc = await listRef.get();
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    const participants = data.participants || [];
+
+                    // Remove specified user from participants
+                    const updatedParticipants = participants.filter(p => p.userId !== userId);
+
+                    await listRef.update({
+                        participants: updatedParticipants,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Reload participants list
+                    await loadModalParticipants(activeListId);
+
+                    // Update share button color (in case we removed the last participant)
+                    const shareBtn = document.querySelector('.icon-btn[onclick="shareList()"]');
+                    if (shareBtn) {
+                        updateShareButtonColor(activeListId, shareBtn);
+                    }
+                } else {
+                    alert('Fant ikke listen');
+                }
+            } catch (error) {
+                console.error('Error removing participant:', error);
+                alert('Feil ved fjerning: ' + error.message);
+            }
         }
 
         async function leaveSharedList() {
@@ -3610,7 +3661,7 @@
                     localStorage.removeItem('activeListId');
                     localStorage.removeItem('userNickname');
                     shoppingList = [];
-                    saveList();
+                    localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
 
                     // Update UI
                     updateUI();
