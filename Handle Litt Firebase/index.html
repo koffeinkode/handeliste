@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Handle Litt</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d97706'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white' font-family='system-ui, -apple-system, sans-serif' font-weight='700'>🛒</text></svg>">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
 
@@ -1217,7 +1218,8 @@
                     'Skredder': '🧵 Skredder',
                     'Bensinstasjon': '⛽ Bensinstasjon',
                     'Post': '📮 Post',
-                    'Diverse': '📦 Diverse'
+                    'Diverse': '📦 Diverse',
+                    'Ukategorisert': '❓ Ukategorisert'
                 },
                 footerCredit: 'Et lite prosjekt av Hallvar Bugge Johnsen',
                 privacyNotice: '🔒 Listen lagres lokalt på enheten din. Når du deler listen, lagres den i 30 dager på nett for sanntidssynkronisering.',
@@ -1279,7 +1281,8 @@
                     'Skredder': '🧵 Tailor',
                     'Bensinstasjon': '⛽ Gas Station',
                     'Post': '📮 Post Office',
-                    'Diverse': '📦 Miscellaneous'
+                    'Diverse': '📦 Miscellaneous',
+                    'Ukategorisert': '❓ Uncategorized'
                 },
                 footerCredit: 'A small project by Hallvar Bugge Johnsen',
                 privacyNotice: '🔒 Your list is stored locally on your device. When you share it, it is stored online for 30 days for real-time sync.',
@@ -1314,7 +1317,8 @@
             'Skredder',
             'Bensinstasjon',
             'Post',
-            'Diverse'
+            'Diverse',
+            'Ukategorisert'
         ];
 
         const DATABASE = {
@@ -1517,7 +1521,8 @@
                 'gratulasjonskort', 'takkekort', 'invitasjon', 'konvolutt', 'ballonger', 'servietter',
                 'festservietter', 'papirbord', 'papptallerkener', 'plastkopper', 'papirkopper', 'sugerør',
                 'festpynt', 'girlander', 'vimpel', 'konfetti', 'stearinlys', 'telys', 'festlys', 'kakedekorasjon'
-            ]
+            ],
+            'Ukategorisert': []
         };
 
         const DATABASE_EN = {
@@ -1719,7 +1724,8 @@
                 'congratulations card', 'thank you card', 'invitation', 'envelope', 'balloons', 'napkins',
                 'party napkins', 'paper plates', 'paper plates', 'plastic cups', 'paper cups', 'straws',
                 'party decorations', 'garland', 'banner', 'confetti', 'candles', 'tea lights', 'party candles', 'cake decorations'
-            ]
+            ],
+            'Ukategorisert': []
         };
 
         let shoppingList = [];
@@ -2690,8 +2696,9 @@
                     submitItemForApproval(userInput, match.category);
                 }
             } else {
-                // No match at all - ask for category
-                askUserForCategory(userInput);
+                // No match at all - add to "Ukategorisert" and send for approval
+                addItemToList(userInput, 'Ukategorisert');
+                submitItemForApproval(userInput, 'Ukategorisert');
             }
         }
 
